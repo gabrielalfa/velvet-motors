@@ -1,0 +1,6 @@
+@VelvetMotors.Api_HostAddress = http://localhost:5172
+
+GET {{VelvetMotors.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

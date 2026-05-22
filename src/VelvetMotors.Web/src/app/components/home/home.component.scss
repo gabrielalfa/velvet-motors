@@ -1,0 +1,337 @@
+.hero {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero__image {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  opacity: 0;
+  position: absolute;
+  transform: scale(1.04);
+  transition: opacity 1200ms ease, transform 6200ms ease;
+  width: 100%;
+}
+
+.hero__image--active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero__overlay {
+  background:
+    linear-gradient(90deg, rgba(6, 5, 4, 0.92), rgba(6, 5, 4, 0.56), rgba(6, 5, 4, 0.8)),
+    linear-gradient(0deg, var(--bg-primary), transparent 42%);
+  inset: 0;
+  position: absolute;
+}
+
+.hero__content {
+  align-content: end;
+  display: grid;
+  gap: 38px;
+  min-height: 100vh;
+  padding: 160px 0 54px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero__copy {
+  max-width: 780px;
+}
+
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(3.4rem, 8vw, 7.8rem);
+  line-height: 0.88;
+  margin: 18px 0 24px;
+  max-width: 900px;
+  text-transform: uppercase;
+}
+
+.hero p {
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.65;
+  max-width: 650px;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.quick-search {
+  backdrop-filter: blur(18px);
+  background: rgba(255, 248, 239, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, 1fr) auto;
+  padding: 16px;
+}
+
+.quick-search label {
+  display: grid;
+  gap: 8px;
+}
+
+.quick-search span {
+  color: var(--accent-hover);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.quick-search input,
+.quick-search select {
+  background: rgba(10, 8, 7, 0.68);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+.brand-strip {
+  border-block: 1px solid var(--border-color);
+  overflow: hidden;
+  padding: 24px 0;
+}
+
+.brand-strip__track {
+  animation: brandRail 24s linear infinite;
+  display: flex;
+  gap: 68px;
+  width: max-content;
+}
+
+.brand-strip span {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(1.1rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  opacity: 0.62;
+  text-transform: uppercase;
+  transition: opacity 180ms ease, color 180ms ease;
+}
+
+.brand-strip span:hover {
+  color: var(--accent-hover);
+  opacity: 1;
+}
+
+.differences,
+.fleet {
+  padding: 110px 0;
+}
+
+.difference-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 44px;
+}
+
+.difference-card {
+  background: linear-gradient(180deg, rgba(255, 248, 239, 0.08), rgba(255, 248, 239, 0.03));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  min-height: 240px;
+  padding: 30px;
+  transition: border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+}
+
+.difference-card:hover {
+  border-color: rgba(183, 110, 61, 0.5);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-6px);
+}
+
+.difference-card__icon {
+  color: var(--accent-hover);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin-bottom: 42px;
+  text-transform: uppercase;
+}
+
+.difference-card h3,
+.vehicle-card h3 {
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+.difference-card p,
+.vehicle-card p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.statement {
+  background:
+    linear-gradient(135deg, rgba(183, 110, 61, 0.2), rgba(8, 7, 6, 0.96)),
+    url('/images/banner/2.png') center/cover;
+  padding: 130px 0;
+}
+
+.statement__inner {
+  display: grid;
+  gap: 8px;
+}
+
+.statement span,
+.statement strong {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 7rem);
+  line-height: 0.95;
+}
+
+.statement span {
+  color: var(--text-secondary);
+}
+
+.statement strong {
+  color: var(--text-primary);
+}
+
+.fleet__heading {
+  align-items: end;
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+}
+
+.fleet__heading .section-title {
+  max-width: 760px;
+}
+
+.fleet__controls {
+  display: flex;
+  gap: 10px;
+}
+
+.fleet__controls button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1.7rem;
+  height: 50px;
+  width: 50px;
+}
+
+.vehicle-rail,
+.skeleton-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(5, minmax(280px, 1fr));
+  margin-top: 44px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+}
+
+.vehicle-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  min-width: 280px;
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+
+.vehicle-card__media {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+}
+
+.vehicle-card__media img {
+  height: 100%;
+  object-fit: cover;
+  transition: transform 360ms ease;
+  width: 100%;
+}
+
+.vehicle-card:hover img {
+  transform: scale(1.05);
+}
+
+.vehicle-card__media span {
+  background: rgba(10, 8, 7, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: var(--accent-hover);
+  font-size: 0.75rem;
+  font-weight: 800;
+  left: 16px;
+  padding: 8px 11px;
+  position: absolute;
+  top: 16px;
+}
+
+.vehicle-card__body {
+  padding: 22px;
+}
+
+.vehicle-card strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  margin: 18px 0;
+}
+
+.vehicle-card .btn {
+  width: 100%;
+}
+
+.skeleton-card {
+  animation: softPulse 1.4s infinite;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-md);
+  height: 420px;
+  min-width: 280px;
+}
+
+@media (max-width: 980px) {
+  .quick-search,
+  .difference-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quick-search button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero h1 {
+    font-size: clamp(3rem, 16vw, 4.9rem);
+  }
+
+  .quick-search,
+  .difference-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fleet__heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .differences,
+  .fleet {
+    padding: 78px 0;
+  }
+}

@@ -1,0 +1,46 @@
+.floating-actions {
+  bottom: 22px;
+  display: grid;
+  gap: 12px;
+  position: fixed;
+  right: 22px;
+  z-index: 35;
+}
+
+.theme-toggle,
+.whatsapp {
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  box-shadow: var(--shadow-soft);
+  height: 54px;
+  width: 54px;
+}
+
+.theme-toggle {
+  background: rgba(20, 16, 13, 0.78);
+  padding: 7px;
+}
+
+.theme-toggle span {
+  background: linear-gradient(135deg, var(--accent-copper), var(--accent-hover));
+  border-radius: 50%;
+  display: block;
+  height: 20px;
+  transform: translateY(0);
+  transition: transform 220ms ease;
+  width: 20px;
+}
+
+.theme-toggle span.is-light {
+  transform: translate(18px, 18px);
+}
+
+.whatsapp {
+  align-items: center;
+  animation: softPulse 2.4s infinite;
+  background: linear-gradient(135deg, #2fd36b, #128c4a);
+  color: white;
+  display: inline-flex;
+  font-weight: 900;
+  justify-content: center;
+}

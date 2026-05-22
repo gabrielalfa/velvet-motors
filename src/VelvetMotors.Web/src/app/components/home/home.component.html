@@ -1,0 +1,123 @@
+<section class="hero" id="home">
+  @for (slide of heroSlides; track slide; let index = $index) {
+    <img class="hero__image" [class.hero__image--active]="activeSlide() === index" [src]="slide" alt="Showroom Velvet Motors">
+  }
+  <div class="hero__overlay"></div>
+
+  <div class="section-shell hero__content">
+    <div class="hero__copy reveal">
+      <span class="eyebrow">Showroom premium em Sao Paulo</span>
+      <h1>Seu proximo destino comeca aqui.</h1>
+      <p>Veiculos selecionados entre R$ 80.000 e R$ 200.000, com curadoria, procedencia e uma experiencia de compra desenhada para impressionar.</p>
+      <div class="hero__actions">
+        <a class="btn btn-primary" href="#estoque">Ver estoque</a>
+        <a class="btn btn-secondary" href="#contato">Agendar visita</a>
+      </div>
+    </div>
+
+    <form class="quick-search reveal" aria-label="Busca rapida">
+      <label>
+        <span>Marca</span>
+        <select>
+          <option>BMW</option>
+          <option>Audi</option>
+          <option>Mercedes</option>
+          <option>Volvo</option>
+        </select>
+      </label>
+      <label>
+        <span>Modelo</span>
+        <input type="text" placeholder="SUV, sedan, coupe">
+      </label>
+      <label>
+        <span>Ano</span>
+        <select>
+          <option>2024</option>
+          <option>2023</option>
+          <option>2022</option>
+          <option>2021</option>
+        </select>
+      </label>
+      <label>
+        <span>Faixa de preco</span>
+        <select>
+          <option>R$ 80k - R$ 120k</option>
+          <option>R$ 120k - R$ 160k</option>
+          <option>R$ 160k - R$ 200k</option>
+        </select>
+      </label>
+      <button class="btn btn-primary" type="button">Buscar</button>
+    </form>
+  </div>
+</section>
+
+<section class="brand-strip" aria-label="Marcas">
+  <div class="brand-strip__track">
+    @for (brand of brands.concat(brands); track $index) {
+      <span>{{ brand.name }}</span>
+    }
+  </div>
+</section>
+
+<section class="differences" id="diferenciais">
+  <div class="section-shell">
+    <span class="eyebrow">Diferenciais</span>
+    <h2 class="section-title">Compra premium sem ruido.</h2>
+    <div class="difference-grid">
+      @for (item of differences; track item.title) {
+        <article class="difference-card reveal">
+          <span class="difference-card__icon">{{ item.icon }}</span>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="statement" id="sobre">
+  <div class="section-shell statement__inner reveal">
+    <span>Mais do que veiculos.</span>
+    <strong>Uma experiencia Velvet.</strong>
+  </div>
+</section>
+
+<section class="fleet" id="estoque">
+  <div class="section-shell">
+    <div class="fleet__heading">
+      <div>
+        <span class="eyebrow">Destaque de frota</span>
+        <h2 class="section-title">Selecionados para chegar com presenca.</h2>
+      </div>
+      <div class="fleet__controls">
+        <button type="button" aria-label="Anterior" (click)="previousVehicle()">‹</button>
+        <button type="button" aria-label="Proximo" (click)="nextVehicle()">›</button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="skeleton-grid" aria-label="Carregando veiculos">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="skeleton-card"></div>
+        }
+      </div>
+    } @else {
+      <div class="vehicle-rail">
+        @for (vehicle of visibleVehicles(); track vehicle.id) {
+          <article class="vehicle-card">
+            <div class="vehicle-card__media">
+              <img [src]="vehicle.image" [alt]="vehicle.name" loading="lazy">
+              <span>{{ vehicle.badge }}</span>
+            </div>
+            <div class="vehicle-card__body">
+              <h3>{{ vehicle.name }}</h3>
+              <p>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0' }} km - {{ vehicle.transmission }}</p>
+              <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+              <a class="btn btn-secondary" href="#contato">Ver Detalhes</a>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
