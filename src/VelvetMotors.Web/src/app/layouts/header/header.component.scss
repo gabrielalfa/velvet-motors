@@ -50,6 +50,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: #fff8ef;
 }
 
 .desktop-nav {
@@ -60,7 +61,7 @@
 
 .desktop-nav a {
   align-items: center;
-  color: var(--text-secondary);
+  color: rgba(255, 248, 239, 0.66);
   display: inline-flex;
   font-size: 0.88rem;
   gap: 7px;
@@ -68,7 +69,7 @@
 }
 
 .desktop-nav a:hover {
-  color: var(--text-primary);
+  color: #fff8ef;
 }
 
 .header-cta {
@@ -96,7 +97,7 @@
 }
 
 .menu-toggle span {
-  background: var(--text-primary);
+  background: #fff8ef;
   display: block;
   height: 2px;
   width: 22px;

@@ -7,9 +7,6 @@
   <nav class="desktop-nav" aria-label="Navegacao principal">
     @for (item of navItems; track item.label) {
       <a [href]="item.href">
-        @if (item.label === 'Estoque') {
-          <iconify-icon icon="lucide:car-front"></iconify-icon>
-        }
         {{ item.label }}
       </a>
     }

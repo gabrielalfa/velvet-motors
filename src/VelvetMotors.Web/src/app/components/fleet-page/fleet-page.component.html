@@ -58,10 +58,10 @@
                 <h2>{{ vehicle.name }}</h2>
                 <p>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0' }} km - {{ vehicle.transmission }}</p>
                 <div class="spec-grid">
-                  <span><iconify-icon icon="lucide:fuel"></iconify-icon>{{ vehicle.fuel }}</span>
-                  <span><iconify-icon icon="lucide:gauge"></iconify-icon>{{ vehicle.km | number:'1.0-0' }} km</span>
-                  <span><iconify-icon icon="lucide:calendar"></iconify-icon>{{ vehicle.year }}</span>
-                  <span><iconify-icon icon="lucide:settings"></iconify-icon>{{ vehicle.transmission }}</span>
+                  <span><iconify-icon icon="lucide:fuel"></iconify-icon><em>{{ vehicle.fuel }}</em></span>
+                  <span><iconify-icon icon="lucide:gauge"></iconify-icon><em>{{ vehicle.km | number:'1.0-0' }} km</em></span>
+                  <span><iconify-icon icon="lucide:calendar"></iconify-icon><em>{{ vehicle.year }}</em></span>
+                  <span><iconify-icon icon="lucide:settings"></iconify-icon><em>{{ vehicle.transmission }}</em></span>
                 </div>
               </div>
               <div class="fleet-card__price">
