@@ -22,8 +22,8 @@
 
 .hero__overlay {
   background:
-    linear-gradient(90deg, rgba(6, 5, 4, 0.92), rgba(6, 5, 4, 0.56), rgba(6, 5, 4, 0.8)),
-    linear-gradient(0deg, var(--bg-primary), transparent 42%);
+    linear-gradient(90deg, rgba(3, 3, 3, 0.94) 0%, rgba(3, 3, 3, 0.78) 42%, rgba(3, 3, 3, 0.58) 68%, rgba(3, 3, 3, 0.82) 100%),
+    linear-gradient(0deg, #0b0a09, transparent 48%);
   inset: 0;
   position: absolute;
 }
@@ -43,16 +43,18 @@
 }
 
 .hero h1 {
+  color: #fff8ef;
   font-family: var(--font-heading);
   font-size: clamp(2.8rem, 6.4vw, 6.2rem);
   line-height: 0.94;
   margin: 18px 0 24px;
   max-width: 820px;
   text-transform: uppercase;
+  text-shadow: 0 18px 48px rgba(0, 0, 0, 0.72);
 }
 
 .hero p {
-  color: var(--text-secondary);
+  color: rgba(255, 248, 239, 0.78);
   font-size: clamp(1rem, 2vw, 1.25rem);
   line-height: 1.65;
   max-width: 650px;
@@ -67,8 +69,8 @@
 
 .quick-search {
   backdrop-filter: blur(18px);
-  background: rgba(255, 248, 239, 0.08);
-  border: 1px solid var(--border-color);
+  background: rgba(12, 10, 9, 0.74);
+  border: 1px solid rgba(255, 248, 239, 0.16);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-strong);
   display: grid;
@@ -92,10 +94,10 @@
 
 .quick-search input,
 .quick-search select {
-  background: rgba(10, 8, 7, 0.68);
-  border: 1px solid var(--border-color);
+  background: rgba(8, 7, 6, 0.86);
+  border: 1px solid rgba(255, 248, 239, 0.13);
   border-radius: 12px;
-  color: var(--text-primary);
+  color: #fff8ef;
   min-height: 48px;
   padding: 0 14px;
 }

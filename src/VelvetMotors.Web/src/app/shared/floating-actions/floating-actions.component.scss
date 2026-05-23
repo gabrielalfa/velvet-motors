@@ -38,9 +38,14 @@
 .whatsapp {
   align-items: center;
   animation: softPulse 2.4s infinite;
-  background: linear-gradient(135deg, #2fd36b, #128c4a);
+  background: #25d366;
   color: white;
   display: inline-flex;
-  font-weight: 900;
   justify-content: center;
+  overflow: hidden;
+  padding: 0;
+}
+
+.whatsapp iconify-icon {
+  font-size: 34px;
 }
