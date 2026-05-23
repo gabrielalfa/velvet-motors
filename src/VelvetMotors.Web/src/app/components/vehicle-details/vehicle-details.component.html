@@ -1,0 +1,144 @@
+@if (vehicle(); as car) {
+  <section class="details-page">
+    <div class="section-shell details-page__head">
+      <a class="back-link" routerLink="/frota">
+        <iconify-icon icon="lucide:arrow-left"></iconify-icon>
+        Voltar para frota
+      </a>
+      <h1>{{ car.name }}</h1>
+      <div class="detail-actions">
+        <span>Stock #VM{{ car.id + 15090 }}</span>
+        <a href="#contato"><iconify-icon icon="lucide:calendar-check"></iconify-icon>Agendar test drive</a>
+        <a href="#comparar"><iconify-icon icon="lucide:git-compare"></iconify-icon>Comparar</a>
+        <a href="#share"><iconify-icon icon="lucide:share-2"></iconify-icon>Compartilhar</a>
+      </div>
+    </div>
+
+    <div class="section-shell details-grid">
+      <main>
+        <div class="gallery-main">
+          <img [src]="car.image" [alt]="car.name">
+          <span class="ribbon">Special</span>
+          <span class="video-badge"><iconify-icon icon="lucide:video"></iconify-icon>1 video</span>
+        </div>
+
+        <div class="thumb-row">
+          @for (image of gallery(); track image) {
+            <img [src]="image" [alt]="car.name">
+          }
+        </div>
+
+        <section class="content-section">
+          <h2>Vehicle overview</h2>
+          <p>
+            Uma unidade selecionada para quem busca presenca, conforto e procedencia. A curadoria Velvet prioriza historico,
+            estado geral, combinacao de cor e pacote de equipamentos para entregar uma experiencia de compra acima do comum.
+          </p>
+          <blockquote>
+            A compra de um carro premium começa na emocao, mas precisa terminar com confianca.
+          </blockquote>
+          <p>
+            O veiculo passa por checagem documental e avaliacao visual, com atendimento consultivo para test drive,
+            financiamento e proposta personalizada.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>Technical</h2>
+          <div class="technical-grid">
+            <div>
+              <h3><iconify-icon icon="lucide:engine"></iconify-icon>Engine</h3>
+              <dl>
+                <div><dt>Layout</dt><dd>{{ car.engine || '2.0 Turbo' }}</dd></div>
+                <div><dt>Fuel type</dt><dd>{{ car.fuel }}</dd></div>
+                <div><dt>Drive</dt><dd>{{ car.drive || 'FWD' }}</dd></div>
+              </dl>
+            </div>
+            <div>
+              <h3><iconify-icon icon="lucide:gauge"></iconify-icon>Performance</h3>
+              <dl>
+                <div><dt>Top speed</dt><dd>220 km/h</dd></div>
+                <div><dt>0 - 100 km/h</dt><dd>7.3 s</dd></div>
+                <div><dt>Transmission</dt><dd>{{ car.transmission }}</dd></div>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Features & Options</h2>
+          <div class="features-grid">
+            @for (group of featureGroups; track $index) {
+              <ul>
+                @for (feature of group; track feature) {
+                  <li><iconify-icon icon="lucide:check"></iconify-icon>{{ feature }}</li>
+                }
+              </ul>
+            }
+          </div>
+        </section>
+
+        <section class="content-section" id="contato">
+          <h2>Location & Contact</h2>
+          <div class="location-box">
+            <iconify-icon icon="lucide:map-pin"></iconify-icon>
+            <div>
+              <strong>Velvet Motors</strong>
+              <p>Av. Europa, 000 - Sao Paulo, SP</p>
+            </div>
+          </div>
+          <div class="contact-grid">
+            <div>
+              <h3><iconify-icon icon="lucide:mail"></iconify-icon>Contact information</h3>
+              <p>Fale com um consultor para receber proposta, laudo e condicoes de financiamento.</p>
+            </div>
+            <form>
+              <input type="text" placeholder="Seu nome">
+              <input type="tel" placeholder="Telefone">
+              <textarea placeholder="Tenho interesse neste veiculo."></textarea>
+              <button class="btn btn-primary" type="button">Enviar mensagem</button>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <aside class="details-sidebar">
+        <div class="price-card">
+          <span>Velvet price</span>
+          <strong>{{ car.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+          <small>Faixa premium curada</small>
+        </div>
+        <a class="contact-card contact-card--whatsapp" href="https://wa.me/5511999990000" target="_blank" rel="noopener">
+          <iconify-icon icon="lucide:message-circle"></iconify-icon>
+          Chat via WhatsApp
+        </a>
+        <a class="contact-card" href="tel:+5511999990000">
+          <iconify-icon icon="lucide:phone"></iconify-icon>
+          (11) 99999-0000
+        </a>
+        <a class="contact-card" href="mailto:contato@velvetmotors.com.br">
+          <iconify-icon icon="lucide:mail"></iconify-icon>
+          Message us
+        </a>
+
+        <div class="spec-panel">
+          <div><span>Condition</span><strong>Selecionado</strong></div>
+          <div><span>Body</span><strong>{{ car.body || 'Sedan' }}</strong></div>
+          <div><span>Make</span><strong>{{ car.name.split(' ')[0] }}</strong></div>
+          <div><span>Fuel type</span><strong>{{ car.fuel }}</strong></div>
+          <div><span>Year</span><strong>{{ car.year }}</strong></div>
+          <div><span>Transmission</span><strong>{{ car.transmission }}</strong></div>
+          <div><span>Mileage</span><strong>{{ car.km | number:'1.0-0' }} km</strong></div>
+          <div><span>Exterior color</span><strong>{{ car.exteriorColor || 'Pearl White' }}</strong></div>
+          <div><span>Interior color</span><strong>{{ car.interiorColor || 'Jet Black' }}</strong></div>
+        </div>
+
+        <div class="mpg-card">
+          <span><strong>18</strong>City MPG</span>
+          <iconify-icon icon="lucide:fuel"></iconify-icon>
+          <span><strong>26</strong>Hwy MPG</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+}

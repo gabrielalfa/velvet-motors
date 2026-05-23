@@ -10,8 +10,14 @@
       <h1>Seu proximo destino comeca aqui.</h1>
       <p>Veiculos selecionados entre R$ 80.000 e R$ 200.000, com curadoria, procedencia e uma experiencia de compra desenhada para impressionar.</p>
       <div class="hero__actions">
-        <a class="btn btn-primary" href="#estoque">Ver estoque</a>
-        <a class="btn btn-secondary" href="#contato">Agendar visita</a>
+        <a class="btn btn-primary" routerLink="/frota">
+          <iconify-icon icon="lucide:car-front"></iconify-icon>
+          Ver estoque
+        </a>
+        <a class="btn btn-secondary" href="#contato">
+          <iconify-icon icon="lucide:calendar-check"></iconify-icon>
+          Agendar visita
+        </a>
       </div>
     </div>
 
@@ -46,7 +52,10 @@
           <option>R$ 160k - R$ 200k</option>
         </select>
       </label>
-      <button class="btn btn-primary" type="button">Buscar</button>
+      <a class="btn btn-primary" routerLink="/frota">
+        <iconify-icon icon="lucide:search"></iconify-icon>
+        Buscar
+      </a>
     </form>
   </div>
 </section>
@@ -113,7 +122,10 @@
               <h3>{{ vehicle.name }}</h3>
               <p>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0' }} km - {{ vehicle.transmission }}</p>
               <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
-              <a class="btn btn-secondary" href="#contato">Ver Detalhes</a>
+              <a class="btn btn-secondary" [routerLink]="['/veiculo', vehicle.id]">
+                <iconify-icon icon="lucide:eye"></iconify-icon>
+                Ver Detalhes
+              </a>
             </div>
           </article>
         }

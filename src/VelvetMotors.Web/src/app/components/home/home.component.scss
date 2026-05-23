@@ -240,6 +240,25 @@
   overflow-x: auto;
   padding-bottom: 10px;
   scroll-snap-type: x mandatory;
+  scrollbar-color: var(--accent-copper) rgba(255, 255, 255, 0.08);
+  scrollbar-width: thin;
+}
+
+.vehicle-rail::-webkit-scrollbar,
+.skeleton-grid::-webkit-scrollbar {
+  height: 10px;
+}
+
+.vehicle-rail::-webkit-scrollbar-track,
+.skeleton-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+
+.vehicle-rail::-webkit-scrollbar-thumb,
+.skeleton-grid::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--accent-copper), var(--accent-hover));
+  border-radius: 999px;
 }
 
 .vehicle-card {

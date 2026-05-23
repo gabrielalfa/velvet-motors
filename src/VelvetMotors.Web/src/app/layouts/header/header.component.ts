@@ -1,10 +1,11 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   imports: [RouterLink],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -14,11 +15,11 @@ export class HeaderComponent {
   readonly menuOpen = signal(false);
 
   readonly navItems = [
-    { label: 'Home', href: '#home' },
-    { label: 'Estoque', href: '#estoque' },
-    { label: 'Sobre', href: '#sobre' },
-    { label: 'Diferenciais', href: '#diferenciais' },
-    { label: 'Contato', href: '#contato' }
+    { label: 'Home', href: '/' },
+    { label: 'Estoque', href: '/frota' },
+    { label: 'Sobre', href: '/#sobre' },
+    { label: 'Diferenciais', href: '/#diferenciais' },
+    { label: 'Contato', href: '/#contato' }
   ];
 
   @HostListener('window:scroll')

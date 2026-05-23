@@ -59,8 +59,11 @@
 }
 
 .desktop-nav a {
+  align-items: center;
   color: var(--text-secondary);
+  display: inline-flex;
   font-size: 0.88rem;
+  gap: 7px;
   transition: color 180ms ease;
 }
 
@@ -69,11 +72,14 @@
 }
 
 .header-cta {
+  align-items: center;
   border: 1px solid rgba(183, 110, 61, 0.45);
   border-radius: 999px;
   color: var(--accent-hover);
+  display: inline-flex;
   font-size: 0.86rem;
   font-weight: 700;
+  gap: 8px;
   padding: 12px 18px;
 }
 

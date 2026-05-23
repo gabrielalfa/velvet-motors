@@ -8,6 +8,12 @@ export interface Vehicle {
   badge: string;
   transmission: string;
   fuel: string;
+  body?: string;
+  engine?: string;
+  drive?: string;
+  exteriorColor?: string;
+  interiorColor?: string;
+  vin?: string;
 }
 
 export interface HeroBanner {
