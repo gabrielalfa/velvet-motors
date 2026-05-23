@@ -60,6 +60,37 @@
   </div>
 </section>
 
+<section class="cta-band">
+  <div class="section-shell cta-band__content reveal">
+    <span class="eyebrow">Comparacao inteligente</span>
+    <h2>Compare modelos com clareza antes de decidir.</h2>
+    <p>Organize preco, ano, quilometragem, cambio e principais atributos em uma visao limpa para escolher com seguranca.</p>
+    <a class="btn btn-primary" routerLink="/comparar">
+      <iconify-icon icon="lucide:git-compare"></iconify-icon>
+      Comparar veiculos
+    </a>
+  </div>
+</section>
+
+<section class="sell-callout">
+  <div class="section-shell sell-callout__grid">
+    <div class="sell-callout__copy reveal">
+      <span class="eyebrow">Venda seu carro</span>
+      <h2>Transforme seu veiculo atual em uma proposta Velvet.</h2>
+      <p>Avaliamos seu carro com criterio, posicionamento de mercado e atendimento consultivo para compra, troca ou consignacao premium.</p>
+      <a class="btn btn-secondary" routerLink="/vender-seu-carro">
+        <iconify-icon icon="lucide:clipboard-check"></iconify-icon>
+        Solicitar avaliacao
+      </a>
+    </div>
+    <div class="sell-callout__panel" aria-hidden="true">
+      <div><span>01</span><strong>Dados do carro</strong></div>
+      <div><span>02</span><strong>Estado geral</strong></div>
+      <div><span>03</span><strong>Contato</strong></div>
+    </div>
+  </div>
+</section>
+
 <section class="brand-strip" aria-label="Marcas">
   <div class="brand-strip__track">
     @for (brand of brands.concat(brands); track $index) {
