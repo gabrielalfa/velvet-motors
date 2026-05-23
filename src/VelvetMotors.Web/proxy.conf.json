@@ -1,0 +1,10 @@
+{
+  "/api/velvet": {
+    "target": "https://www.ictapi.com.br",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/velvet": "/Velvet"
+    }
+  }
+}

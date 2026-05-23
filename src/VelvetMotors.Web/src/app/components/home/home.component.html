@@ -1,5 +1,5 @@
 <section class="hero" id="home">
-  @for (slide of heroSlides; track slide; let index = $index) {
+  @for (slide of heroSlides(); track slide; let index = $index) {
     <img class="hero__image" [class.hero__image--active]="activeSlide() === index" [src]="slide" alt="Showroom Velvet Motors">
   }
   <div class="hero__overlay"></div>

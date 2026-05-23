@@ -14,32 +14,35 @@ export class HomeComponent {
   readonly brands = this.inventoryService.brands;
   readonly differences = this.inventoryService.differences;
   readonly vehicles = this.inventoryService.vehicles;
+  readonly banners = this.inventoryService.banners;
   readonly loading = this.inventoryService.loading;
   readonly activeSlide = signal(0);
   readonly fleetOffset = signal(0);
 
-  readonly heroSlides = [
-    '/images/banner/1.png',
-    '/images/banner/2.png',
-    '/images/banner/3.png'
-  ];
+  readonly heroSlides = computed(() => this.banners().map((banner) => banner.image));
 
   readonly visibleVehicles = computed(() => {
     const offset = this.fleetOffset();
-    return [...this.vehicles.slice(offset), ...this.vehicles.slice(0, offset)];
+    const vehicles = this.vehicles();
+    return [...vehicles.slice(offset), ...vehicles.slice(0, offset)];
   });
 
   constructor() {
+    this.inventoryService.loadHomeData();
+
     setInterval(() => {
-      this.activeSlide.update((slide) => (slide + 1) % this.heroSlides.length);
+      const totalSlides = this.heroSlides().length || 1;
+      this.activeSlide.update((slide) => (slide + 1) % totalSlides);
     }, 5200);
   }
 
   nextVehicle(): void {
-    this.fleetOffset.update((offset) => (offset + 1) % this.vehicles.length);
+    const totalVehicles = this.vehicles().length || 1;
+    this.fleetOffset.update((offset) => (offset + 1) % totalVehicles);
   }
 
   previousVehicle(): void {
-    this.fleetOffset.update((offset) => (offset - 1 + this.vehicles.length) % this.vehicles.length);
+    const totalVehicles = this.vehicles().length || 1;
+    this.fleetOffset.update((offset) => (offset - 1 + totalVehicles) % totalVehicles);
   }
 }
