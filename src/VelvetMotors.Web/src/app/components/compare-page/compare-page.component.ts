@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InventoryService } from '../../services/inventory.service';
 import { Vehicle } from '../../models/vehicle.model';
@@ -11,8 +11,9 @@ import { Vehicle } from '../../models/vehicle.model';
   templateUrl: './compare-page.component.html',
   styleUrl: './compare-page.component.scss'
 })
-export class ComparePageComponent {
+export class ComparePageComponent implements OnDestroy {
   private readonly inventoryService = inject(InventoryService);
+  private readonly inventoryIntervalId: ReturnType<typeof setInterval>;
 
   readonly vehicles = computed(() => this.inventoryService.vehicles().slice(0, 3));
   readonly rows = [
@@ -32,5 +33,13 @@ export class ComparePageComponent {
 
   constructor() {
     this.inventoryService.loadHomeData();
+
+    this.inventoryIntervalId = setInterval(() => {
+      this.inventoryService.loadHomeData();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.inventoryIntervalId);
   }
 }

@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject, signal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { InventoryService } from '../../services/inventory.service';
@@ -12,8 +12,9 @@ import { Vehicle } from '../../models/vehicle.model';
   templateUrl: './fleet-page.component.html',
   styleUrl: './fleet-page.component.scss'
 })
-export class FleetPageComponent {
+export class FleetPageComponent implements OnDestroy {
   private readonly inventoryService = inject(InventoryService);
+  private readonly inventoryIntervalId: ReturnType<typeof setInterval>;
 
   readonly vehicles = this.inventoryService.vehicles;
   readonly loading = this.inventoryService.loading;
@@ -44,6 +45,14 @@ export class FleetPageComponent {
 
   constructor() {
     this.inventoryService.loadHomeData();
+
+    this.inventoryIntervalId = setInterval(() => {
+      this.inventoryService.loadHomeData();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.inventoryIntervalId);
   }
 
   setSearch(value: string): void {

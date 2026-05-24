@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { InventoryService } from '../../services/inventory.service';
 
@@ -10,9 +10,10 @@ import { InventoryService } from '../../services/inventory.service';
   templateUrl: './vehicle-details.component.html',
   styleUrl: './vehicle-details.component.scss'
 })
-export class VehicleDetailsComponent {
+export class VehicleDetailsComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly inventoryService = inject(InventoryService);
+  private readonly inventoryIntervalId: ReturnType<typeof setInterval>;
 
   readonly vehicleId = Number(this.route.snapshot.paramMap.get('id') ?? 1);
   readonly vehicles = this.inventoryService.vehicles;
@@ -37,5 +38,13 @@ export class VehicleDetailsComponent {
 
   constructor() {
     this.inventoryService.loadHomeData();
+
+    this.inventoryIntervalId = setInterval(() => {
+      this.inventoryService.loadHomeData();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.inventoryIntervalId);
   }
 }

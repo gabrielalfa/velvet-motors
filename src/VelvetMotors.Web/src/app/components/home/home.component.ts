@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject, signal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { InventoryService } from '../../services/inventory.service';
@@ -11,8 +11,10 @@ import { InventoryService } from '../../services/inventory.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnDestroy {
   private readonly inventoryService = inject(InventoryService);
+  private readonly heroIntervalId: ReturnType<typeof setInterval>;
+  private readonly inventoryIntervalId: ReturnType<typeof setInterval>;
   readonly brands = this.inventoryService.brands;
   readonly differences = this.inventoryService.differences;
   readonly vehicles = this.inventoryService.vehicles;
@@ -32,10 +34,19 @@ export class HomeComponent {
   constructor() {
     this.inventoryService.loadHomeData();
 
-    setInterval(() => {
+    this.heroIntervalId = setInterval(() => {
       const totalSlides = this.heroSlides().length || 1;
       this.activeSlide.update((slide) => (slide + 1) % totalSlides);
     }, 5200);
+
+    this.inventoryIntervalId = setInterval(() => {
+      this.inventoryService.loadHomeData();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.heroIntervalId);
+    clearInterval(this.inventoryIntervalId);
   }
 
   nextVehicle(): void {
