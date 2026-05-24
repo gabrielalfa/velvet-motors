@@ -30,6 +30,8 @@ export class HomeComponent implements OnDestroy {
     const vehicles = this.vehicles();
     return [...vehicles.slice(offset), ...vehicles.slice(0, offset)];
   });
+  readonly featuredVehicle = computed(() => this.visibleVehicles()[0]);
+  readonly secondaryVehicles = computed(() => this.visibleVehicles().slice(1, 4));
 
   constructor() {
     this.inventoryService.loadHomeData();

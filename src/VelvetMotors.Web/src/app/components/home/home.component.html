@@ -127,7 +127,8 @@
     <div class="fleet__heading">
       <div>
         <span class="eyebrow">Destaque de frota</span>
-        <h2 class="section-title">Selecionados para chegar com presenca.</h2>
+        <h2 class="section-title">Featured Listings</h2>
+        <p>Uma curadoria enxuta com modelos prontos para comparar, conhecer e negociar com seguranca.</p>
       </div>
       <div class="fleet__controls">
         <button type="button" aria-label="Anterior" (click)="previousVehicle()">‹</button>
@@ -142,9 +143,9 @@
         }
       </div>
     } @else {
-      <div class="vehicle-rail">
-        @for (vehicle of visibleVehicles(); track vehicle.id) {
-          <article class="vehicle-card">
+      <div class="featured-gallery">
+        @if (featuredVehicle(); as vehicle) {
+          <article class="featured-gallery__hero">
             <div class="vehicle-card__media">
               <img [src]="vehicle.image" [alt]="vehicle.name" loading="lazy">
               <span>{{ vehicle.badge }}</span>
@@ -160,6 +161,23 @@
             </div>
           </article>
         }
+        <div class="featured-gallery__side">
+          @for (vehicle of secondaryVehicles(); track vehicle.id) {
+            <article class="featured-mini">
+              <img [src]="vehicle.image" [alt]="vehicle.name" loading="lazy">
+              <div>
+                <span>{{ vehicle.badge }}</span>
+                <h3>{{ vehicle.name }}</h3>
+                <p>{{ vehicle.year }} - {{ vehicle.transmission }}</p>
+                <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+              </div>
+            </article>
+          }
+          <a class="featured-gallery__cta" routerLink="/frota">
+            <span>Ver toda a frota</span>
+            <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+          </a>
+        </div>
       </div>
     }
   </div>
