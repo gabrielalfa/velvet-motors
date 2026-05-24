@@ -196,7 +196,9 @@
 .statement strong {
   font-family: var(--font-display);
   font-size: clamp(2.8rem, 7vw, 7rem);
-  line-height: 0.95;
+  font-weight: 800;
+  line-height: 1.02;
+  text-transform: uppercase;
 }
 
 .statement span {
