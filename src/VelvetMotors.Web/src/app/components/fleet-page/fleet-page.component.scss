@@ -207,10 +207,11 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 170px;
+  grid-template-columns: 260px minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
-  min-height: 292px;
+  min-height: 190px;
   overflow: hidden;
+  position: relative;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
 }
 
@@ -364,18 +365,25 @@
 .fleet-card__price {
   align-content: center;
   background: linear-gradient(135deg, var(--accent-copper), #8f4e2b);
-  border-left: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 248, 239, 0.18);
+  clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
   display: grid;
-  gap: 8px;
-  grid-column: 3;
-  grid-row: 1 / 4;
+  gap: 1px;
   justify-items: center;
-  padding: 22px 16px;
+  min-height: 78px;
+  min-width: 150px;
+  padding: 11px 14px 11px 28px;
+  position: absolute;
+  right: 0;
+  top: 0;
   text-align: center;
+  z-index: 2;
 }
 
 .fleet-card__price small {
   color: rgba(255, 255, 255, 0.82);
+  font-size: 0.68rem;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -383,11 +391,11 @@
   color: white;
   font-family: var(--font-heading);
   font-size: 1.45rem;
+  line-height: 1.1;
 }
 
 .fleet-card__price .btn {
-  min-height: 38px;
-  padding: 0 14px;
+  display: none;
 }
 
 .filters__reset {
@@ -494,16 +502,10 @@
 @media (max-width: 1180px) {
   .fleet-card {
     grid-template-columns: 260px minmax(0, 1fr);
-    grid-template-rows: auto auto auto auto;
   }
 
   .fleet-card__price {
-    border-left: 0;
-    border-top: 1px solid var(--border-color);
-    grid-column: 1 / -1;
-    grid-row: auto;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
+    position: absolute;
   }
 }
 
@@ -527,11 +529,14 @@
   }
 
   .fleet-card__price {
-    border-left: 0;
-    border-top: 1px solid var(--border-color);
-    grid-column: auto;
-    grid-row: auto;
-    grid-template-columns: 1fr;
+    bottom: 0;
+    clip-path: none;
+    left: 0;
+    min-height: 72px;
+    min-width: 0;
+    right: auto;
+    top: auto;
+    width: 100%;
   }
 
   .spec-grid {
