@@ -77,21 +77,8 @@
                 <span class="fleet-card__ribbon">Special</span>
                 <span class="fleet-card__video"><iconify-icon icon="lucide:film"></iconify-icon>Video</span>
               </div>
-              <div class="fleet-card__content">
+              <div class="fleet-card__name">
                 <h2>{{ vehicle.name }}</h2>
-                <div class="spec-grid">
-                  <span><iconify-icon icon="lucide:gauge"></iconify-icon><small>Mileage</small><em>{{ vehicle.km | number:'1.0-0' }}</em></span>
-                  <span><iconify-icon icon="lucide:fuel"></iconify-icon><small>Fuel type</small><em>{{ vehicle.fuel }}</em></span>
-                  <span><iconify-icon icon="lucide:calendar-days"></iconify-icon><small>Year</small><em>{{ vehicle.year }}</em></span>
-                  <span><iconify-icon icon="lucide:settings"></iconify-icon><small>Transmission</small><em>{{ vehicle.transmission }}</em></span>
-                  <span><iconify-icon icon="lucide:route"></iconify-icon><small>Body</small><em>{{ resolveBody(vehicle) }}</em></span>
-                </div>
-                <div class="fleet-card__actions">
-                  <span>Stock #VM{{ vehicle.id + 153090 }}</span>
-                  <button type="button"><iconify-icon icon="lucide:git-compare"></iconify-icon>Add to compare</button>
-                  <button type="button"><iconify-icon icon="lucide:share-2"></iconify-icon>Share this</button>
-                  <strong>Certified</strong>
-                </div>
               </div>
               <div class="fleet-card__price">
                 <small>Buy for</small>
@@ -100,6 +87,23 @@
                   <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
                   Ver detalhes
                 </a>
+              </div>
+              <div class="fleet-card__specs">
+                <div class="spec-grid">
+                  <span><iconify-icon icon="lucide:gauge"></iconify-icon><small>Mileage</small><em>{{ vehicle.km | number:'1.0-0' }}</em></span>
+                  <span><iconify-icon icon="lucide:fuel"></iconify-icon><small>Fuel type</small><em>{{ vehicle.fuel }}</em></span>
+                  <span><iconify-icon icon="lucide:calendar-days"></iconify-icon><small>Year</small><em>{{ vehicle.year }}</em></span>
+                  <span><iconify-icon icon="lucide:settings"></iconify-icon><small>Transmission</small><em>{{ vehicle.transmission }}</em></span>
+                  <span><iconify-icon icon="lucide:route"></iconify-icon><small>Body</small><em>{{ resolveBody(vehicle) }}</em></span>
+                </div>
+              </div>
+              <div class="fleet-card__meta">
+                <div class="fleet-card__actions">
+                  <span>Stock #VM{{ vehicle.id + 153090 }}</span>
+                  <button type="button"><iconify-icon icon="lucide:git-compare"></iconify-icon>Add to compare</button>
+                  <button type="button"><iconify-icon icon="lucide:share-2"></iconify-icon>Share this</button>
+                  <strong>Certified</strong>
+                </div>
               </div>
             </article>
           }
