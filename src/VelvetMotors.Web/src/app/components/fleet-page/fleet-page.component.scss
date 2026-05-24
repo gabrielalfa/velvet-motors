@@ -262,8 +262,9 @@
 }
 
 .fleet-card__name {
+  min-height: 72px;
   min-width: 0;
-  padding: 26px 28px 10px;
+  padding: 24px 176px 8px 28px;
 }
 
 .fleet-card h2 {
@@ -368,11 +369,11 @@
   border: 1px solid rgba(255, 248, 239, 0.18);
   clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
   display: grid;
-  gap: 1px;
+  gap: 0;
   justify-items: center;
-  min-height: 78px;
-  min-width: 150px;
-  padding: 11px 14px 11px 28px;
+  min-height: 52px;
+  min-width: 132px;
+  padding: 7px 12px 7px 26px;
   position: absolute;
   right: 0;
   top: 0;
@@ -382,7 +383,7 @@
 
 .fleet-card__price small {
   color: rgba(255, 255, 255, 0.82);
-  font-size: 0.68rem;
+  font-size: 0.56rem;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -390,7 +391,7 @@
 .fleet-card__price strong {
   color: white;
   font-family: var(--font-heading);
-  font-size: 1.45rem;
+  font-size: 1.08rem;
   line-height: 1.1;
 }
 
@@ -537,6 +538,11 @@
     right: auto;
     top: auto;
     width: 100%;
+  }
+
+  .fleet-card__name {
+    min-height: 0;
+    padding-right: 28px;
   }
 
   .spec-grid {
