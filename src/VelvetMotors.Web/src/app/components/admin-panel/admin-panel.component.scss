@@ -1,0 +1,470 @@
+.admin-shell {
+  background: #080706;
+  color: #fff8ef;
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  background: linear-gradient(180deg, #12100e, #080706);
+  border-right: 1px solid rgba(255, 248, 239, 0.1);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 28px;
+  padding: 26px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-brand,
+.admin-user {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.admin-brand span,
+.admin-user span {
+  align-items: center;
+  background: var(--accent-copper);
+  border-radius: 50%;
+  color: #130d09;
+  display: inline-flex;
+  font-weight: 900;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.admin-brand strong {
+  font-family: var(--font-heading);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-menu {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.admin-menu button,
+.ghost-action,
+.primary-action,
+.quick-actions button,
+.admin-table button,
+.showcase-grid button {
+  align-items: center;
+  border: 1px solid rgba(255, 248, 239, 0.12);
+  border-radius: 14px;
+  display: inline-flex;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.admin-menu button {
+  background: transparent;
+  color: rgba(255, 248, 239, 0.68);
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.admin-menu button.active,
+.admin-menu button:hover {
+  background: rgba(183, 110, 61, 0.16);
+  border-color: rgba(183, 110, 61, 0.34);
+  color: #fff8ef;
+}
+
+.admin-user {
+  border: 1px solid rgba(255, 248, 239, 0.1);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.admin-user div {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-user small,
+.panel-card small,
+.admin-table small,
+.lead-board small {
+  color: rgba(255, 248, 239, 0.55);
+}
+
+.admin-main {
+  display: grid;
+  gap: 28px;
+  padding: 30px;
+}
+
+.admin-topbar {
+  align-items: center;
+  display: flex;
+  gap: 22px;
+  justify-content: space-between;
+}
+
+.admin-topbar h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 4.1rem);
+  line-height: 1;
+  margin: 10px 0 0;
+  text-transform: uppercase;
+}
+
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.ghost-action {
+  background: rgba(255, 248, 239, 0.06);
+  color: #fff8ef;
+}
+
+.primary-action {
+  background: linear-gradient(135deg, var(--accent-copper), var(--accent-hover));
+  border-color: transparent;
+  color: #130d09;
+  font-weight: 900;
+}
+
+.metric-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.metric-grid article,
+.panel-card {
+  background: linear-gradient(180deg, rgba(255, 248, 239, 0.08), rgba(255, 248, 239, 0.035));
+  border: 1px solid rgba(255, 248, 239, 0.11);
+  border-radius: 22px;
+  box-shadow: var(--shadow-soft);
+}
+
+.metric-grid article {
+  display: grid;
+  gap: 8px;
+  min-height: 150px;
+  padding: 22px;
+}
+
+.metric-grid span,
+.showcase-grid span,
+.lead-board span {
+  color: var(--accent-hover);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.metric-grid strong {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+
+.admin-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.6fr);
+}
+
+.panel-card {
+  padding: 24px;
+}
+
+.panel-card.large {
+  min-height: 360px;
+}
+
+.panel-heading {
+  align-items: start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.panel-heading h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+  margin: 8px 0 0;
+}
+
+.admin-chart {
+  align-items: end;
+  display: flex;
+  gap: 14px;
+  min-height: 230px;
+}
+
+.admin-chart span {
+  background: linear-gradient(180deg, var(--accent-hover), var(--accent-copper));
+  border-radius: 999px 999px 12px 12px;
+  flex: 1;
+}
+
+.quick-actions,
+.settings-grid,
+.form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.quick-actions button,
+.admin-table button,
+.showcase-grid button {
+  background: rgba(255, 248, 239, 0.06);
+  color: #fff8ef;
+  justify-content: center;
+}
+
+.admin-table {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-table article {
+  align-items: center;
+  border: 1px solid rgba(255, 248, 239, 0.1);
+  border-radius: 18px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 86px minmax(0, 1fr) auto auto;
+  padding: 12px;
+}
+
+.admin-table img {
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  height: 64px;
+  object-fit: cover;
+  width: 86px;
+}
+
+.admin-table div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-table strong,
+.admin-table small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table > article > span {
+  color: #fff8ef;
+  font-family: var(--font-heading);
+  font-weight: 900;
+}
+
+.showcase-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.showcase-grid article {
+  border: 1px solid rgba(255, 248, 239, 0.1);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.showcase-grid img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  width: 100%;
+}
+
+.showcase-grid div {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.featured-admin {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 18px;
+}
+
+.featured-admin button {
+  background: rgba(255, 248, 239, 0.06);
+  border: 1px solid rgba(255, 248, 239, 0.1);
+  border-radius: 18px;
+  color: #fff8ef;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  text-align: left;
+}
+
+.featured-admin img {
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.settings-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.settings-grid label {
+  align-items: center;
+  background: rgba(255, 248, 239, 0.06);
+  border: 1px solid rgba(255, 248, 239, 0.1);
+  border-radius: 14px;
+  display: flex;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+}
+
+.lead-board {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.lead-board article {
+  background: rgba(255, 248, 239, 0.06);
+  border: 1px solid rgba(255, 248, 239, 0.1);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.lead-board strong {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+}
+
+.lead-board p {
+  color: rgba(255, 248, 239, 0.72);
+  margin: 0;
+}
+
+.form-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.form-grid label {
+  color: rgba(255, 248, 239, 0.68);
+  display: grid;
+  font-size: 0.76rem;
+  font-weight: 900;
+  gap: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.form-grid input {
+  background: rgba(8, 7, 6, 0.72);
+  border: 1px solid rgba(255, 248, 239, 0.13);
+  border-radius: 14px;
+  color: #fff8ef;
+  min-height: 50px;
+  padding: 0 14px;
+}
+
+@media (max-width: 1100px) {
+  .admin-shell {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .admin-sidebar {
+    padding: 18px;
+  }
+
+  .admin-brand strong,
+  .admin-menu button:not(.active),
+  .admin-menu button.active,
+  .admin-user div {
+    font-size: 0;
+  }
+
+  .admin-menu button {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .admin-menu iconify-icon {
+    font-size: 1.4rem;
+  }
+
+  .metric-grid,
+  .admin-grid,
+  .showcase-grid,
+  .featured-admin,
+  .lead-board {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    height: auto;
+    position: static;
+  }
+
+  .admin-brand strong,
+  .admin-menu button:not(.active),
+  .admin-menu button.active,
+  .admin-user div {
+    font-size: inherit;
+  }
+
+  .admin-menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-main {
+    padding: 18px;
+  }
+
+  .admin-topbar,
+  .panel-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .metric-grid,
+  .admin-grid,
+  .showcase-grid,
+  .featured-admin,
+  .settings-grid,
+  .lead-board,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-table article {
+    align-items: start;
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .admin-table article > span,
+  .admin-table button {
+    grid-column: 1 / -1;
+  }
+}

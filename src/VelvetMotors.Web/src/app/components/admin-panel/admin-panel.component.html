@@ -1,0 +1,227 @@
+<main class="admin-shell">
+  <aside class="admin-sidebar">
+    <a class="admin-brand" routerLink="/">
+      <span>VM</span>
+      <strong>Velvet Admin</strong>
+    </a>
+
+    <nav class="admin-menu" aria-label="Menu administrativo">
+      @for (item of menu; track item.id) {
+        <button type="button" [class.active]="activeView() === item.id" (click)="selectView(item.id)">
+          <iconify-icon [icon]="item.icon"></iconify-icon>
+          {{ item.label }}
+        </button>
+      }
+    </nav>
+
+    <div class="admin-user">
+      <span>GA</span>
+      <div>
+        <strong>Gestor Velvet</strong>
+        <small>Preview para aprovacao</small>
+      </div>
+    </div>
+  </aside>
+
+  <section class="admin-main">
+    <header class="admin-topbar">
+      <div>
+        <span class="eyebrow">Painel administrativo</span>
+        <h1>{{ activeTitle() }}</h1>
+      </div>
+      <div class="topbar-actions">
+        <a class="ghost-action" routerLink="/">
+          <iconify-icon icon="lucide:external-link"></iconify-icon>
+          Ver site
+        </a>
+        <button class="primary-action" type="button">
+          <iconify-icon icon="lucide:plus"></iconify-icon>
+          Novo item
+        </button>
+      </div>
+    </header>
+
+    @if (activeView() === 'dashboard') {
+      <section class="metric-grid">
+        <article>
+          <span>Veiculos ativos</span>
+          <strong>{{ totalInventory() }}</strong>
+          <small>+4 publicados esta semana</small>
+        </article>
+        <article>
+          <span>Valor em vitrine</span>
+          <strong>{{ inventoryValue() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+          <small>Frota premium curada</small>
+        </article>
+        <article>
+          <span>Leads abertos</span>
+          <strong>18</strong>
+          <small>7 via WhatsApp</small>
+        </article>
+        <article>
+          <span>Banners ativos</span>
+          <strong>{{ banners().length }}</strong>
+          <small>Home com carrossel inicial</small>
+        </article>
+      </section>
+
+      <section class="admin-grid">
+        <article class="panel-card large">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">Performance</span>
+              <h2>Resumo de interesse</h2>
+            </div>
+            <small>Ultimos 7 dias</small>
+          </div>
+          <div class="admin-chart">
+            <span style="height: 48%"></span>
+            <span style="height: 72%"></span>
+            <span style="height: 54%"></span>
+            <span style="height: 88%"></span>
+            <span style="height: 64%"></span>
+            <span style="height: 78%"></span>
+            <span style="height: 92%"></span>
+          </div>
+        </article>
+
+        <article class="panel-card">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">Acoes rapidas</span>
+              <h2>Controle do site</h2>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button type="button" (click)="selectView('fleet')">Cadastrar veiculo</button>
+            <button type="button" (click)="selectView('showcase')">Editar banner inicial</button>
+            <button type="button" (click)="selectView('leads')">Ver propostas</button>
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeView() === 'fleet') {
+      <section class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Gestao de frota</span>
+            <h2>Veiculos publicados</h2>
+          </div>
+          <button class="primary-action" type="button">Adicionar veiculo</button>
+        </div>
+
+        <div class="admin-table">
+          @for (vehicle of vehicles().slice(0, 8); track vehicle.id) {
+            <article>
+              <img [src]="vehicle.image" [alt]="vehicle.name">
+              <div>
+                <strong>{{ vehicle.name }}</strong>
+                <small>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0':'pt-BR' }} km - {{ vehicle.transmission }}</small>
+              </div>
+              <span>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+              <button type="button">Editar</button>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeView() === 'showcase') {
+      <section class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Vitrine Home</span>
+            <h2>Carrossel inicial e destaques</h2>
+          </div>
+          <button class="primary-action" type="button">Salvar vitrine</button>
+        </div>
+
+        <div class="showcase-grid">
+          @for (banner of banners(); track banner.id) {
+            <article>
+              <img [src]="banner.image" [alt]="banner.title">
+              <div>
+                <span>Banner {{ banner.id }}</span>
+                <strong>{{ banner.headline }}</strong>
+                <button type="button">Trocar imagem</button>
+              </div>
+            </article>
+          }
+        </div>
+
+        <div class="featured-admin">
+          @for (vehicle of featuredVehicles(); track vehicle.id) {
+            <button type="button">
+              <img [src]="vehicle.image" [alt]="vehicle.name">
+              <span>{{ vehicle.name }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeView() === 'compare') {
+      <section class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Pagina de comparacao</span>
+            <h2>Campos exibidos ao cliente</h2>
+          </div>
+          <button class="primary-action" type="button">Atualizar regras</button>
+        </div>
+
+        <div class="settings-grid">
+          <label><input type="checkbox" checked> Preco</label>
+          <label><input type="checkbox" checked> Quilometragem</label>
+          <label><input type="checkbox" checked> Cambio</label>
+          <label><input type="checkbox" checked> Combustivel</label>
+          <label><input type="checkbox" checked> Caracteristicas premium</label>
+          <label><input type="checkbox"> Historico de manutencao</label>
+        </div>
+      </section>
+    }
+
+    @if (activeView() === 'leads') {
+      <section class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">CRM comercial</span>
+            <h2>Leads e oportunidades</h2>
+          </div>
+          <button class="primary-action" type="button">Exportar</button>
+        </div>
+
+        <div class="lead-board">
+          @for (lead of leads; track lead.name) {
+            <article>
+              <span>{{ lead.status }}</span>
+              <strong>{{ lead.name }}</strong>
+              <p>{{ lead.interest }}</p>
+              <small>{{ lead.channel }}</small>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeView() === 'settings') {
+      <section class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Configuracoes</span>
+            <h2>Dados da loja e integracoes</h2>
+          </div>
+          <button class="primary-action" type="button">Salvar ajustes</button>
+        </div>
+
+        <div class="form-grid">
+          <label>Nome da loja <input value="Velvet Motors"></label>
+          <label>WhatsApp <input value="(11) 99999-0000"></label>
+          <label>Endereco <input value="Av. Europa, 000 - Sao Paulo, SP"></label>
+          <label>API de veiculos <input value="https://www.ictapi.com.br/Velvet/Home"></label>
+        </div>
+      </section>
+    }
+  </section>
+</main>

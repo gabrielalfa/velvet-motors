@@ -182,31 +182,69 @@
 
 .statement {
   background:
-    linear-gradient(135deg, rgba(183, 110, 61, 0.2), rgba(8, 7, 6, 0.96)),
+    linear-gradient(90deg, rgba(8, 7, 6, 0.96) 0%, rgba(8, 7, 6, 0.82) 46%, rgba(8, 7, 6, 0.52) 100%),
+    linear-gradient(135deg, rgba(183, 110, 61, 0.26), rgba(8, 7, 6, 0.78)),
     url('/images/banner/2.png') center/cover;
-  padding: 130px 0;
+  border-block: 1px solid var(--border-color);
+  padding: 96px 0;
 }
 
 .statement__inner {
+  align-items: center;
   display: grid;
-  gap: 8px;
+  gap: 48px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
 }
 
-.statement span,
-.statement strong {
-  font-family: var(--font-display);
-  font-size: clamp(2.8rem, 7vw, 7rem);
-  font-weight: 800;
-  line-height: 1.02;
+.statement__copy h2 {
+  color: #fff8ef;
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 5vw, 5rem);
+  line-height: 0.98;
+  margin: 16px 0 24px;
+  max-width: 860px;
   text-transform: uppercase;
 }
 
-.statement span {
-  color: var(--text-secondary);
+.statement__copy p {
+  color: rgba(255, 248, 239, 0.74);
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  line-height: 1.75;
+  margin: 0;
+  max-width: 690px;
 }
 
-.statement strong {
-  color: var(--text-primary);
+.statement__action {
+  background:
+    linear-gradient(180deg, rgba(255, 248, 239, 0.11), rgba(255, 248, 239, 0.04)),
+    rgba(12, 10, 9, 0.78);
+  border: 1px solid rgba(255, 248, 239, 0.16);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+  padding: 30px;
+}
+
+.statement__action span {
+  color: rgba(255, 248, 239, 0.68);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.statement__action strong {
+  color: #fff8ef;
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  line-height: 1;
+}
+
+.statement__action .btn {
+  margin-top: 10px;
+  width: 100%;
 }
 
 .fleet__heading {
@@ -519,6 +557,14 @@
     grid-template-columns: 1fr;
   }
 
+  .statement__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .statement__action {
+    max-width: 440px;
+  }
+
   .featured-gallery {
     grid-template-columns: 1fr;
   }
@@ -542,6 +588,18 @@
   .differences,
   .fleet {
     padding: 78px 0;
+  }
+
+  .statement {
+    padding: 76px 0;
+  }
+
+  .statement__inner {
+    gap: 28px;
+  }
+
+  .statement__action {
+    padding: 24px;
   }
 
   .featured-mini {
