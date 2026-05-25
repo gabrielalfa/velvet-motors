@@ -30,24 +30,19 @@ No GitHub, acesse:
 Settings > Secrets and variables > Actions > New repository secret
 ```
 
-Crie:
+Crie somente:
 
 ```text
-FTP_SERVER
-FTP_USERNAME
 FTP_PASSWORD
-FTP_PROTOCOL
-FTP_SERVER_DIR
 ```
 
-Exemplo:
+A senha deve ficar no GitHub Secret. Os outros dados foram fixados no workflow para evitar erro de digitacao:
 
 ```text
 FTP_SERVER=ftp.web-ded-180026a.kinghost.net
 FTP_USERNAME=velvetmotors
-FTP_PASSWORD=senha_ftp_no_secret
 FTP_PROTOCOL=ftp
-FTP_SERVER_DIR=/
+FTP_SERVER_DIR=/www/
 ```
 
 Tambem existe o host `ftp.velvetmotors.com.br`, mas neste primeiro momento use o host alternativo:
@@ -62,13 +57,13 @@ O caminho fisico informado pela KingHost e:
 D:\web\localuser\velvetmotors
 ```
 
-Normalmente o FTP ja abre na raiz correspondente a esse caminho. Por isso, comece com:
+O FTP abre com as pastas `banco` e `www`. Por isso o deploy publica em:
 
 ```text
-FTP_SERVER_DIR=/
+FTP_SERVER_DIR=/www/
 ```
 
-Se o deploy subir os arquivos para uma pasta errada ou o site nao abrir, ajuste para o diretorio publico indicado no painel da KingHost.
+Se o painel da KingHost indicar outro diretorio publico, ajuste `server-dir` no workflow.
 
 ## Quando publica
 

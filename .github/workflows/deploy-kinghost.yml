@@ -49,9 +49,9 @@ jobs:
       - name: Deploy to KingHost by FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: ftp.web-ded-180026a.kinghost.net
+          username: velvetmotors
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ${{ secrets.FTP_PROTOCOL }}
+          protocol: ftp
           local-dir: src/VelvetMotors.Web/dist/VelvetMotors.Web/browser/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          server-dir: /www/
