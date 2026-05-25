@@ -1,0 +1,48 @@
+<section class="compare-page">
+  <div class="section-shell compare-hero">
+    <span class="eyebrow">Comparacao inteligente</span>
+    <h1>Compare veiculos lado a lado.</h1>
+    <p>Veja atributos importantes em uma tabela limpa e decida com mais seguranca antes de falar com um consultor.</p>
+    <a class="btn btn-secondary" routerLink="/frota">
+      <iconify-icon icon="lucide:plus-circle"></iconify-icon>
+      Adicionar carros da frota
+    </a>
+  </div>
+
+  <div class="section-shell compare-grid">
+    <aside class="compare-title">
+      <h2>Compare<br>Vehicles</h2>
+      <span></span>
+    </aside>
+
+    <div class="compare-columns">
+      @for (vehicle of vehicles(); track vehicle.id) {
+        <article class="compare-car">
+          <img [src]="vehicle.image" [alt]="vehicle.name">
+          <h3>{{ vehicle.name }}</h3>
+          <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+        </article>
+      }
+      @for (slot of [1, 2, 3].slice(vehicles().length); track slot) {
+        <article class="compare-car compare-car--empty">
+          <iconify-icon icon="lucide:car-front"></iconify-icon>
+          <span>Add car to compare</span>
+        </article>
+      }
+    </div>
+
+    <div class="compare-table">
+      @for (row of rows; track row.label) {
+        <div class="compare-row">
+          <span>{{ row.label }}</span>
+          @for (vehicle of vehicles(); track vehicle.id) {
+            <strong>{{ row.value(vehicle) }}</strong>
+          }
+          @for (slot of [1, 2, 3].slice(vehicles().length); track slot) {
+            <strong>-</strong>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

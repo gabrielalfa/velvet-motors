@@ -1,0 +1,86 @@
+<section class="sell-page">
+  <div class="section-shell sell-layout">
+    <aside class="sell-intro">
+      <a class="back-link" routerLink="/">
+        <iconify-icon icon="lucide:arrow-left"></iconify-icon>
+        Voltar
+      </a>
+      <span class="eyebrow">Avaliacao Velvet</span>
+      <h1>Sell your vehicle</h1>
+      <i></i>
+      <p>Informe os dados do seu veiculo para receber uma estimativa inicial e conversar com um consultor Velvet.</p>
+      <p>Apos a analise, voce decide entre venda direta, troca ou consignacao premium.</p>
+    </aside>
+
+    <main class="sell-form-card">
+      <div class="steps">
+        @for (step of steps; track step.number) {
+          <div class="step" [class.step--active]="$index === 0">
+            <span>{{ step.number }}</span>
+            <strong>{{ step.title }}</strong>
+            <small>{{ step.subtitle }}</small>
+          </div>
+        }
+      </div>
+
+      <form>
+        <label>
+          <span>Make</span>
+          <input type="text" placeholder="BMW, Audi, Mercedes">
+        </label>
+        <label>
+          <span>Model</span>
+          <input type="text" placeholder="Modelo">
+        </label>
+        <label>
+          <span>Year</span>
+          <input type="number" placeholder="2022">
+        </label>
+        <label>
+          <span>Transmission</span>
+          <input type="text" placeholder="Automatico">
+        </label>
+        <label>
+          <span>Mileage</span>
+          <input type="number" placeholder="32000">
+        </label>
+        <label>
+          <span>VIN</span>
+          <input type="text" placeholder="Opcional">
+        </label>
+
+        <div class="upload-row">
+          <label>
+            <span>Upload your car photos</span>
+            <button type="button">
+              <iconify-icon icon="lucide:paperclip"></iconify-icon>
+              Choose file...
+            </button>
+          </label>
+          <label>
+            <span>Provide a hosted video url of your car</span>
+            <input type="url" placeholder="https://">
+          </label>
+        </div>
+
+        <label>
+          <span>Exterior color</span>
+          <input type="text" placeholder="Pearl white">
+        </label>
+        <label>
+          <span>Interior color</span>
+          <input type="text" placeholder="Jet black">
+        </label>
+        <label>
+          <span>Owner</span>
+          <input type="text" placeholder="Unico dono">
+        </label>
+
+        <button class="btn btn-primary" type="button">
+          <iconify-icon icon="lucide:save"></iconify-icon>
+          Save and continue
+        </button>
+      </form>
+    </main>
+  </div>
+</section>

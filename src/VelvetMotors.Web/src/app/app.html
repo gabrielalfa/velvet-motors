@@ -1,6 +1,10 @@
-<app-header />
+@if (!isAdminArea()) {
+  <app-header />
+}
 <main>
   <router-outlet />
 </main>
-<app-footer />
-<app-floating-actions />
+@if (!isAdminArea()) {
+  <app-footer />
+  <app-floating-actions />
+}

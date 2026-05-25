@@ -1,0 +1,138 @@
+.compare-page {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 136px 0 100px;
+}
+
+.compare-hero {
+  margin-bottom: 64px;
+  text-align: center;
+}
+
+.compare-hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, 5.5rem);
+  line-height: 1.02;
+  margin: 14px auto 20px;
+  max-width: 930px;
+  text-transform: uppercase;
+}
+
+.compare-hero p {
+  color: var(--text-secondary);
+  font-size: 1.12rem;
+  line-height: 1.7;
+  margin: 0 auto 28px;
+  max-width: 780px;
+}
+
+.compare-grid {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 250px minmax(0, 1fr);
+}
+
+.compare-title h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.95;
+  margin: 34px 0 22px;
+  text-transform: uppercase;
+}
+
+.compare-title span {
+  background: linear-gradient(90deg, var(--accent-copper), var(--accent-hover));
+  display: block;
+  height: 5px;
+  width: 64px;
+}
+
+.compare-columns {
+  display: grid;
+  gap: 24px;
+  grid-column: 2;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.compare-car {
+  background: linear-gradient(180deg, rgba(255, 248, 239, 0.08), rgba(255, 248, 239, 0.03));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 12px;
+  min-height: 260px;
+  padding: 16px;
+  text-align: center;
+}
+
+.compare-car img {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  width: 100%;
+}
+
+.compare-car h3 {
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+.compare-car strong {
+  color: var(--accent-hover);
+}
+
+.compare-car--empty {
+  align-content: center;
+  color: var(--text-secondary);
+  justify-items: center;
+}
+
+.compare-car--empty iconify-icon {
+  color: var(--accent-hover);
+  font-size: 3rem;
+}
+
+.compare-table {
+  display: grid;
+  grid-column: 1 / -1;
+  margin-top: 24px;
+}
+
+.compare-row {
+  border-bottom: 1px solid var(--border-color);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 250px repeat(3, 1fr);
+  min-height: 48px;
+  padding: 14px 0;
+}
+
+.compare-row span {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.compare-row strong {
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-columns {
+    grid-column: auto;
+    overflow-x: auto;
+  }
+
+  .compare-car {
+    min-width: 240px;
+  }
+
+  .compare-row {
+    grid-template-columns: 160px repeat(3, minmax(180px, 1fr));
+    overflow-x: auto;
+  }
+}

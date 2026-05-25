@@ -6,11 +6,16 @@
 
   <nav class="desktop-nav" aria-label="Navegacao principal">
     @for (item of navItems; track item.label) {
-      <a [href]="item.href">{{ item.label }}</a>
+      <a [href]="item.href">
+        {{ item.label }}
+      </a>
     }
   </nav>
 
-  <a class="header-cta" href="#contato">Agendar visita</a>
+  <a class="header-cta" href="/#contato">
+    <iconify-icon icon="lucide:calendar-check"></iconify-icon>
+    Agendar visita
+  </a>
 
   <button class="menu-toggle" type="button" aria-label="Abrir menu" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
     <span></span>

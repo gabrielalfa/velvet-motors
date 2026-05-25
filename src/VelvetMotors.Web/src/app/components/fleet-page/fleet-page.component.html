@@ -1,0 +1,195 @@
+<section class="fleet-page">
+  <div class="section-shell fleet-page__header">
+    <div>
+      <span class="eyebrow">Estoque Velvet</span>
+      <h1>Frota selecionada</h1>
+      <p>Filtre por marca, ano, faixa de preco e encontre o carro certo para sua proxima fase.</p>
+    </div>
+    <button class="filter-trigger" type="button" (click)="filtersOpen.set(true)">
+      <iconify-icon icon="lucide:sliders-horizontal"></iconify-icon>
+      Filtros
+    </button>
+  </div>
+
+  <div class="section-shell fleet-shortcuts">
+    <a href="/api/velvet/Home" target="_blank" rel="noopener">
+      <strong>VIN-CHECK</strong>
+      <iconify-icon icon="lucide:car-front"></iconify-icon>
+    </a>
+    <a routerLink="/comparar">
+      <strong>COMPARE</strong>
+      <span>
+        <iconify-icon icon="lucide:scan-search"></iconify-icon>
+        <em>{{ filteredVehicles().length }}</em>
+      </span>
+    </a>
+  </div>
+
+  <div class="section-shell fleet-page__layout">
+    <aside class="filters filters--desktop">
+      <ng-container [ngTemplateOutlet]="filtersTemplate"></ng-container>
+    </aside>
+
+    <div class="filter-canvas" [class.filter-canvas--open]="filtersOpen()">
+      <button class="filter-canvas__backdrop" type="button" aria-label="Fechar filtros" (click)="closeFilters()"></button>
+      <aside class="filters filters--mobile">
+        <div class="filters__mobile-head">
+          <strong>Filtros</strong>
+          <button type="button" aria-label="Fechar" (click)="closeFilters()">
+            <iconify-icon icon="lucide:x"></iconify-icon>
+          </button>
+        </div>
+        <ng-container [ngTemplateOutlet]="filtersTemplate"></ng-container>
+      </aside>
+    </div>
+
+    <section class="fleet-results">
+      <div class="fleet-results__toolbar">
+        <label>
+          <span>Sort by:</span>
+          <select [ngModel]="sortBy()" (ngModelChange)="setSortBy($event)">
+            <option value="newest">Date: newest first</option>
+            <option value="price-low">Price: lowest first</option>
+            <option value="price-high">Price: highest first</option>
+            <option value="mileage-low">Mileage: lowest first</option>
+          </select>
+        </label>
+        <div>
+          <iconify-icon icon="lucide:layout-grid"></iconify-icon>
+          <iconify-icon icon="lucide:list"></iconify-icon>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <div class="fleet-card fleet-card--loading"></div>
+      } @else if (!filteredVehicles().length) {
+        <div class="empty-state">
+          <iconify-icon icon="lucide:search-x"></iconify-icon>
+          <h2>Nenhum veiculo encontrado</h2>
+          <p>Ajuste os filtros ou confira se a API retornou carros para a frota.</p>
+        </div>
+      } @else {
+        <div class="fleet-list">
+          @for (vehicle of filteredVehicles(); track vehicleTrackBy($index, vehicle)) {
+            <article class="fleet-card">
+              <div class="fleet-card__image">
+                <img [src]="vehicle.image" [alt]="vehicle.name" loading="lazy">
+                <span class="fleet-card__ribbon">Special</span>
+                <span class="fleet-card__video"><iconify-icon icon="lucide:film"></iconify-icon>Video</span>
+              </div>
+              <div class="fleet-card__name">
+                <h2>{{ vehicle.name }}</h2>
+              </div>
+              <div class="fleet-card__price">
+                <small>Buy for</small>
+                <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+                <a class="btn btn-primary" [routerLink]="['/veiculo', vehicle.id]">
+                  <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
+                  Ver detalhes
+                </a>
+              </div>
+              <div class="fleet-card__specs">
+                <div class="spec-grid">
+                  <span><iconify-icon icon="lucide:gauge"></iconify-icon><small>Mileage</small><em>{{ vehicle.km | number:'1.0-0' }}</em></span>
+                  <span><iconify-icon icon="lucide:fuel"></iconify-icon><small>Fuel type</small><em>{{ vehicle.fuel }}</em></span>
+                  <span><iconify-icon icon="lucide:calendar-days"></iconify-icon><small>Year</small><em>{{ vehicle.year }}</em></span>
+                  <span><iconify-icon icon="lucide:settings"></iconify-icon><small>Transmission</small><em>{{ vehicle.transmission }}</em></span>
+                  <span><iconify-icon icon="lucide:route"></iconify-icon><small>Body</small><em>{{ resolveBody(vehicle) }}</em></span>
+                </div>
+              </div>
+              <div class="fleet-card__meta">
+                <div class="fleet-card__actions">
+                  <span>Stock #VM{{ vehicle.id + 153090 }}</span>
+                  <button type="button"><iconify-icon icon="lucide:git-compare"></iconify-icon>Add to compare</button>
+                  <button type="button"><iconify-icon icon="lucide:share-2"></iconify-icon>Share this</button>
+                  <strong>Certified</strong>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</section>
+
+<ng-template #filtersTemplate>
+  <div class="filters__head">
+    <iconify-icon icon="lucide:tune"></iconify-icon>
+    <div>
+      <strong>Filtro de veiculos</strong>
+      <span>Refine a curadoria</span>
+    </div>
+  </div>
+
+  <label>
+    <span>Busca</span>
+    <input type="search" placeholder="BMW, Audi, Mercedes" [ngModel]="search()" (ngModelChange)="setSearch($event)">
+  </label>
+
+  <label>
+    <span>Condicao</span>
+    <select [ngModel]="condition()" (ngModelChange)="setCondition($event)">
+      @for (item of conditions; track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Carroceria</span>
+    <select [ngModel]="body()" (ngModelChange)="setBody($event)">
+      @for (item of bodies; track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Marca</span>
+    <select [ngModel]="brand()" (ngModelChange)="setBrand($event)">
+      @for (item of brands(); track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Ano</span>
+    <select [ngModel]="year()" (ngModelChange)="setYear($event)">
+      @for (item of years(); track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Quilometragem maxima: {{ maxMileage() | number:'1.0-0' }} km</span>
+    <input type="range" min="0" max="120000" step="5000" [ngModel]="maxMileage()" (ngModelChange)="setMaxMileage($event)">
+  </label>
+
+  <label>
+    <span>Preco maximo: {{ maxPrice() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+    <input type="range" min="80000" max="200000" step="5000" [ngModel]="maxPrice()" (ngModelChange)="setMaxPrice($event)">
+  </label>
+
+  <label>
+    <span>Transmissao</span>
+    <select [ngModel]="transmission()" (ngModelChange)="setTransmission($event)">
+      @for (item of transmissions; track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Status</span>
+    <select [ngModel]="status()" (ngModelChange)="setStatus($event)">
+      @for (item of statuses; track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <button class="filters__reset" type="button" (click)="resetFilters()">Reset all</button>
+</ng-template>
