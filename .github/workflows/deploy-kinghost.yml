@@ -46,12 +46,17 @@ jobs:
           path: src/VelvetMotors.Web/dist/VelvetMotors.Web/browser
           if-no-files-found: error
 
+      - name: Install FTP client
+        run: sudo apt-get update && sudo apt-get install -y lftp
+        working-directory: .
+
       - name: Deploy to KingHost by FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ftp.web-ded-180026a.kinghost.net
-          username: velvetmotors
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          local-dir: src/VelvetMotors.Web/dist/VelvetMotors.Web/browser/
-          server-dir: /www/
+        run: |
+          lftp -u "velvetmotors,${{ secrets.FTP_PASSWORD }}" ftp://ftp.web-ded-180026a.kinghost.net <<'FTP_COMMANDS'
+          set ftp:ssl-allow no
+          set ftp:passive-mode yes
+          set net:timeout 20
+          set net:max-retries 2
+          mirror --reverse --delete --verbose --parallel=2 dist/VelvetMotors.Web/browser/ /www/
+          bye
+          FTP_COMMANDS
