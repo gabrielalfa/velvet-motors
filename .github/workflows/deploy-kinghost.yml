@@ -51,8 +51,10 @@ jobs:
         working-directory: .
 
       - name: Deploy to KingHost by FTP
+        env:
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -u "velvetmotors,${{ secrets.FTP_PASSWORD }}" ftp://ftp.web-ded-180026a.kinghost.net <<'FTP_COMMANDS'
+          lftp -u velvetmotors ftp://ftp.web-ded-180026a.kinghost.net <<'FTP_COMMANDS'
           set ftp:ssl-allow no
           set ftp:passive-mode yes
           set net:timeout 20
