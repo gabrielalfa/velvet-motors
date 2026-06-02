@@ -23,9 +23,7 @@
         }
       </div>
 
-      @if (feedback()) {
-        <p class="proposal-feedback">{{ feedback() }}</p>
-      }
+      <app-feedback-modal [message]="feedback()" [type]="feedbackType()" (closed)="clearFeedback()"></app-feedback-modal>
 
       <form (ngSubmit)="submitProposal()">
         <label>

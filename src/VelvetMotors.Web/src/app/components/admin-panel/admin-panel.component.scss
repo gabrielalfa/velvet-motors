@@ -196,62 +196,6 @@
   padding: 24px;
 }
 
-.admin-feedback {
-  align-items: center;
-  background: rgba(183, 110, 61, 0.14);
-  border: 1px solid rgba(183, 110, 61, 0.32);
-  border-radius: 16px;
-  color: #fff8ef;
-  display: flex;
-  gap: 16px;
-  justify-content: space-between;
-  margin: 0;
-  padding: 14px 16px;
-}
-
-.admin-feedback p {
-  margin: 0;
-}
-
-.admin-feedback button {
-  align-items: center;
-  background: rgba(255, 248, 239, 0.06);
-  border: 1px solid rgba(255, 248, 239, 0.16);
-  border-radius: 999px;
-  color: #fff8ef;
-  cursor: pointer;
-  display: inline-flex;
-  height: 38px;
-  justify-content: center;
-  position: relative;
-  width: 38px;
-}
-
-.admin-feedback button span {
-  animation: feedbackCountdown 5s linear forwards;
-  border: 2px solid rgba(255, 248, 239, 0.24);
-  border-right-color: var(--accent-hover);
-  border-radius: 50%;
-  inset: 4px;
-  position: absolute;
-}
-
-.admin-feedback iconify-icon {
-  font-size: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes feedbackCountdown {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .admin-editor {
   border: 1px solid rgba(255, 248, 239, 0.1);
   border-radius: 18px;
@@ -983,6 +927,10 @@
 
 .showcase-form {
   margin: 0;
+}
+
+.banner-card-upload input {
+  display: none;
 }
 
 .showcase-grid {

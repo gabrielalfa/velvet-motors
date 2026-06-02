@@ -9,6 +9,7 @@ import { AdminAuthService } from '../../services/admin-auth.service';
 import { InventoryService } from '../../services/inventory.service';
 import { ProposalService } from '../../services/proposal.service';
 import { SiteContentService } from '../../services/site-content.service';
+import { FeedbackModalComponent, FeedbackType } from '../../shared/feedback-modal/feedback-modal.component';
 
 type AdminView = 'dashboard' | 'content' | 'fleet' | 'showcase' | 'compare' | 'leads' | 'settings';
 type VehicleEditorStep = 'general' | 'media' | 'description' | 'technical' | 'features';
@@ -23,7 +24,7 @@ type CompareField = {
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [CurrencyPipe, DecimalPipe, FormsModule, RouterLink],
+  imports: [CurrencyPipe, DecimalPipe, FeedbackModalComponent, FormsModule, RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
@@ -48,6 +49,7 @@ export class AdminPanelComponent {
   readonly inventoryValue = computed(() => this.vehicles().reduce((total, vehicle) => total + vehicle.price, 0));
   readonly activeTitle = computed(() => this.menu.find((item) => item.id === this.activeView())?.label ?? 'Dashboard');
   readonly saving = signal(false);
+  readonly feedbackType = signal<FeedbackType>('info');
   readonly vehicleEditorOpen = signal(false);
   readonly vehicleEditorStep = signal<VehicleEditorStep>('general');
   readonly highlightsOpen = signal(false);
@@ -78,7 +80,13 @@ export class AdminPanelComponent {
   editingVehicle: Vehicle = this.createVehicleDraft();
   editingBanner: HeroBanner = this.createBannerDraft();
   editingContent: SiteContent = this.siteContentService.createDraft();
+  pendingBannerImageFile: File | null = null;
+  readonly pendingBannerImageName = signal('');
   private feedbackTimer?: number;
+  private pendingBannerImagePreviewUrl = '';
+  private persistedBannerImageUrl = '';
+  private readonly maxBannerImageSize = 1024 * 1024;
+  private readonly allowedBannerImageTypes = ['image/png', 'image/jpeg'];
   readonly filteredVehicles = computed(() => {
     const search = this.vehicleSearch().trim().toLowerCase();
     const status = this.vehicleStatusFilter();
@@ -154,7 +162,7 @@ export class AdminPanelComponent {
     { id: 'media', label: 'Fotos e video', icon: 'lucide:images' },
     { id: 'description', label: 'Descricao', icon: 'lucide:file-text' },
     { id: 'technical', label: 'Tecnica', icon: 'lucide:gauge' },
-    { id: 'features', label: 'Features', icon: 'lucide:list-checks' }
+    { id: 'features', label: 'Itens', icon: 'lucide:list-checks' }
   ];
   readonly vehicleStatusFilters = ['Todos', 'Publicado', 'Nao publicado', 'Vendido', 'Reservado'];
   readonly evaluationStatusFilters = ['Todos', 'Nova', 'Em atendimento', 'Finalizada'];
@@ -226,7 +234,10 @@ export class AdminPanelComponent {
 
     this.siteContentService.save(this.editingContent, token).subscribe((result) => {
       this.saving.set(false);
-      this.showFeedback(this.siteContentService.operationMessage(result) || 'Conteudo do site atualizado.');
+      this.showFeedback(
+        this.siteContentService.operationMessage(result) || 'Conteudo do site atualizado.',
+        this.siteContentService.operationSucceeded(result) ? 'success' : 'error'
+      );
 
       if (this.siteContentService.operationSucceeded(result)) {
         this.editingContent = this.siteContentService.createDraft();
@@ -360,7 +371,7 @@ export class AdminPanelComponent {
     const nextSortOrder = this.highlightVehicles().length + 1;
 
     if (!wasFeatured && this.highlightVehicles().length >= 7) {
-      this.showFeedback('Voce pode destacar ate 7 veiculos na home.');
+      this.showFeedback('Voce pode destacar ate 7 veiculos na home.', 'error');
       return;
     }
 
@@ -373,9 +384,12 @@ export class AdminPanelComponent {
     }
 
     this.inventoryService.saveVehicle(vehicle, token, false).subscribe((result) => {
-      this.showFeedback(this.inventoryService.operationSucceeded(result)
-        ? (vehicle.featured ? 'Veiculo adicionado aos destaques.' : 'Veiculo removido dos destaques.')
-        : this.inventoryService.operationMessage(result));
+      this.showFeedback(
+        this.inventoryService.operationSucceeded(result)
+          ? (vehicle.featured ? 'Veiculo adicionado aos destaques.' : 'Veiculo removido dos destaques.')
+          : this.inventoryService.operationMessage(result),
+        this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
+      );
     });
   }
 
@@ -409,7 +423,7 @@ export class AdminPanelComponent {
       completed += 1;
       if (completed === updates.length) {
         this.saving.set(false);
-        this.showFeedback('Destaques da home atualizados.');
+        this.showFeedback('Destaques da home atualizados.', 'success');
         this.loadAdminVehicles();
         this.closeHighlights();
       }
@@ -430,7 +444,10 @@ export class AdminPanelComponent {
 
     this.inventoryService.saveVehicle(this.editingVehicle, token, false).subscribe((result) => {
       this.saving.set(false);
-      this.showFeedback(this.inventoryService.operationMessage(result));
+      this.showFeedback(
+        this.inventoryService.operationMessage(result),
+        this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
+      );
 
       if (this.inventoryService.operationSucceeded(result)) {
         this.loadAdminVehicles();
@@ -447,9 +464,19 @@ export class AdminPanelComponent {
       return;
     }
 
+    this.saving.set(true);
+    this.clearFeedback();
+
     this.inventoryService.deleteVehicle(vehicle.id, token).subscribe((result) => {
-      this.showFeedback(this.inventoryService.operationMessage(result));
+      this.saving.set(false);
+      this.showFeedback(
+        this.inventoryService.operationMessage(result) || 'Veiculo removido da frota.',
+        this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
+      );
       this.vehiclePage.set(this.activeVehiclePage());
+    }, () => {
+      this.saving.set(false);
+      this.showFeedback('Nao foi possivel remover o veiculo no banco de dados.', 'error');
     });
   }
 
@@ -479,7 +506,7 @@ export class AdminPanelComponent {
     const evaluations = this.filteredEvaluations();
 
     if (!evaluations.length) {
-      this.showFeedback('Nenhuma avaliacao encontrada para exportar.');
+      this.showFeedback('Nenhuma avaliacao encontrada para exportar.', 'error');
       return;
     }
 
@@ -507,7 +534,7 @@ export class AdminPanelComponent {
     const reportWindow = window.open('', '_blank', 'noopener,noreferrer');
 
     if (!reportWindow) {
-      this.showFeedback('O navegador bloqueou a janela de exportacao. Permita pop-ups para gerar o PDF.');
+      this.showFeedback('O navegador bloqueou a janela de exportacao. Permita pop-ups para gerar o PDF.', 'error');
       return;
     }
 
@@ -598,17 +625,49 @@ export class AdminPanelComponent {
     reportWindow.document.close();
     reportWindow.focus();
     reportWindow.print();
-    this.showFeedback('Relatorio de avaliacoes pronto para salvar em PDF.');
+    this.showFeedback('Relatorio de avaliacoes pronto para salvar em PDF.', 'success');
   }
 
   newBanner(): void {
+    this.clearPendingBannerImage();
     this.editingBanner = this.createBannerDraft();
+    this.persistedBannerImageUrl = this.editingBanner.image;
     this.selectView('showcase');
   }
 
   editBanner(banner: HeroBanner): void {
+    this.clearPendingBannerImage();
     this.editingBanner = { ...banner };
+    this.persistedBannerImageUrl = banner.image;
     this.selectView('showcase');
+  }
+
+  uploadBannerImage(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    input.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    const validationMessage = this.validateBannerImage(file);
+
+    if (validationMessage) {
+      this.showFeedback(validationMessage, 'error');
+      return;
+    }
+
+    this.clearPendingBannerImage();
+    this.pendingBannerImageFile = file;
+    this.pendingBannerImageName.set(file.name);
+    this.pendingBannerImagePreviewUrl = URL.createObjectURL(file);
+    this.editingBanner = {
+      ...this.editingBanner,
+      image: this.pendingBannerImagePreviewUrl
+    };
+    this.showFeedback('Imagem selecionada. Confira a previa e clique em salvar para publicar.', 'success');
   }
 
   saveBanner(): void {
@@ -624,12 +683,51 @@ export class AdminPanelComponent {
     this.editingBanner.title = this.siteContent().heroEyebrow;
     this.editingBanner.headline = this.siteContent().heroTitle;
 
-    this.inventoryService.saveBanner(this.editingBanner, token).subscribe((result) => {
+    if (this.pendingBannerImageFile) {
+      this.inventoryService.uploadVehicleMedia(this.pendingBannerImageFile, token, 'banners').subscribe({
+        next: (uploadResult) => {
+          const rawUrl = uploadResult.Url ?? uploadResult.url ?? '';
+
+          if (!rawUrl) {
+            this.saving.set(false);
+            this.showFeedback(this.inventoryService.operationMessage(uploadResult) || 'Nao foi possivel enviar a imagem do banner.', 'error');
+            return;
+          }
+
+          this.editingBanner = {
+            ...this.editingBanner,
+            image: rawUrl
+          };
+          this.persistBanner(this.editingBanner, token);
+        },
+        error: () => {
+          this.saving.set(false);
+          this.showFeedback('Falha ao enviar a imagem do banner.', 'error');
+        }
+      });
+      return;
+    }
+
+    this.persistBanner(this.editingBanner, token);
+  }
+
+  private persistBanner(banner: HeroBanner, token: string): void {
+    this.inventoryService.saveBanner(banner, token).subscribe((result) => {
       this.saving.set(false);
-      this.showFeedback(this.inventoryService.operationMessage(result) || 'Banner salvo e publicado no carrossel inicial.');
+      this.showFeedback(
+        this.inventoryService.operationMessage(result) || 'Banner salvo e publicado no carrossel inicial.',
+        this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
+      );
 
       if (this.inventoryService.operationSucceeded(result)) {
-        this.editingBanner = this.createBannerDraft();
+        const savedImage = this.inventoryService.resolveMediaUrl(banner.image);
+        this.editingBanner = {
+          ...banner,
+          image: savedImage
+        };
+        this.persistedBannerImageUrl = savedImage;
+        this.inventoryService.banners.update((items) => items.map((item) => item.id === banner.id ? this.editingBanner : item));
+        this.clearPendingBannerImage();
       }
     });
   }
@@ -642,7 +740,10 @@ export class AdminPanelComponent {
     }
 
     this.inventoryService.deleteBanner(banner.id, token).subscribe((result) => {
-      this.showFeedback(this.inventoryService.operationMessage(result) || 'Banner removido do carrossel inicial.');
+      this.showFeedback(
+        this.inventoryService.operationMessage(result) || 'Banner removido do carrossel inicial.',
+        this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
+      );
     });
   }
 
@@ -694,7 +795,7 @@ export class AdminPanelComponent {
     }
 
     this.proposalService.updateStatus(proposal.id, status, token).subscribe((result) => {
-      this.showFeedback(this.proposalService.message(result));
+      this.showFeedback(this.proposalService.message(result), this.proposalService.succeeded(result) ? 'success' : 'error');
     });
   }
 
@@ -706,18 +807,18 @@ export class AdminPanelComponent {
     }
 
     this.proposalService.deleteProposal(proposal.id, token).subscribe((result) => {
-      this.showFeedback(this.proposalService.message(result));
+      this.showFeedback(this.proposalService.message(result), this.proposalService.succeeded(result) ? 'success' : 'error');
     });
   }
 
   changePassword(): void {
     if (!this.newPassword() || this.newPassword() !== this.confirmPassword()) {
-      this.showFeedback('Confirme a nova senha corretamente.');
+      this.showFeedback('Confirme a nova senha corretamente.', 'error');
       return;
     }
 
     this.authService.changePassword(this.currentPassword(), this.newPassword()).subscribe((result) => {
-      this.showFeedback(result.Message ?? result.message ?? '');
+      this.showFeedback(result.Message ?? result.message ?? '', (result.Success ?? result.success) ? 'success' : 'error');
 
       if (result.Success ?? result.success) {
         this.currentPassword.set('');
@@ -773,12 +874,45 @@ export class AdminPanelComponent {
     };
   }
 
+  private validateBannerImage(file: File): string {
+    const hasAllowedType = this.allowedBannerImageTypes.includes(file.type)
+      || /\.(png|jpe?g)$/i.test(file.name);
+
+    if (!hasAllowedType) {
+      return 'Use apenas imagem PNG ou JPG no banner.';
+    }
+
+    if (file.size > this.maxBannerImageSize) {
+      return 'A imagem do banner precisa ter no maximo 1 MB.';
+    }
+
+    return '';
+  }
+
+  private clearPendingBannerImage(): void {
+    if (this.pendingBannerImagePreviewUrl) {
+      URL.revokeObjectURL(this.pendingBannerImagePreviewUrl);
+    }
+
+    if (this.editingBanner.image === this.pendingBannerImagePreviewUrl) {
+      this.editingBanner = {
+        ...this.editingBanner,
+        image: this.persistedBannerImageUrl || this.editingBanner.image
+      };
+    }
+
+    this.pendingBannerImagePreviewUrl = '';
+    this.pendingBannerImageFile = null;
+    this.pendingBannerImageName.set('');
+  }
+
   private refreshVehicleState(): void {
     this.inventoryService.vehicles.set([...this.vehicles()]);
   }
 
-  showFeedback(message: string): void {
+  showFeedback(message: string, type?: FeedbackType): void {
     this.clearFeedbackTimer();
+    this.feedbackType.set(type ?? this.inferFeedbackType(message));
     this.feedback.set(message);
 
     this.feedbackTimer = window.setTimeout(() => {
@@ -789,7 +923,15 @@ export class AdminPanelComponent {
 
   clearFeedback(): void {
     this.clearFeedbackTimer();
+    this.feedbackType.set('info');
     this.feedback.set('');
+  }
+
+  private inferFeedbackType(message: string): FeedbackType {
+    const normalized = message.toLowerCase();
+    const errorTerms = ['falha', 'erro', 'nao foi possivel', 'não foi possível', 'invalida', 'inválida', 'obrigatorio', 'obrigatório', 'confirme', 'nenhuma', 'limite', 'maximo', 'máximo'];
+
+    return errorTerms.some((term) => normalized.includes(term)) ? 'error' : 'success';
   }
 
   private clearFeedbackTimer(): void {

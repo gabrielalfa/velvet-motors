@@ -1,19 +1,27 @@
 @if (vehicle(); as car) {
   <section class="details-page">
     <div class="section-shell details-page__head">
-      <a class="back-link" routerLink="/frota">
+      <a class="back-link" routerLink="/veiculos">
         <iconify-icon icon="lucide:arrow-left"></iconify-icon>
-        Voltar para frota
+        Voltar para veículos
       </a>
+      <span class="details-eyebrow">Veículo selecionado Velvet</span>
       <h1>{{ car.name }}</h1>
+      <p class="details-intro">
+        {{ car.year }} - {{ car.km | number:'1.0-0':'pt-BR' }} km - {{ car.transmission }}.
+        Curadoria, procedência e atendimento consultivo para uma compra premium.
+      </p>
       <div class="detail-actions">
         <span>Stock #VM{{ car.id + 15090 }}</span>
-        <a href="#contato"><iconify-icon icon="lucide:calendar-check"></iconify-icon>Agendar test drive</a>
+        <a href="#contato"><iconify-icon icon="lucide:calendar-check"></iconify-icon>Agendar visita</a>
         <button type="button" (click)="compareVehicle(car)">
           <iconify-icon icon="lucide:git-compare"></iconify-icon>
-          {{ compareService.isSelected(car.id) ? 'Ver comparacao' : 'Comparar' }}
+          {{ compareService.isSelected(car.id) ? 'Ver comparação' : 'Comparar' }}
         </button>
-        <a href="#share"><iconify-icon icon="lucide:share-2"></iconify-icon>Compartilhar</a>
+        <button type="button" [class.is-copied]="shareFeedback()" (click)="shareVehicle(car)">
+          <iconify-icon [icon]="shareFeedback() ? 'lucide:check' : 'lucide:share-2'"></iconify-icon>
+          {{ shareFeedback() || 'Compartilhar' }}
+        </button>
       </div>
     </div>
 
@@ -35,11 +43,12 @@
         </div>
 
         <section class="content-section">
-          <h2>Vehicle overview</h2>
+          <span class="eyebrow">Resumo do veículo</span>
+          <h2>Visão geral</h2>
           @if (car.description) {
             <p>{{ car.description }}</p>
           } @else {
-            <div class="empty-box">Descricao ainda nao cadastrada para este veiculo.</div>
+            <div class="empty-box">Descrição ainda não cadastrada para este veículo.</div>
           }
         </section>
 
@@ -47,45 +56,47 @@
           <section class="content-section video-section">
             <div>
               <span class="eyebrow">Video</span>
-              <h2>Veja este veiculo em movimento</h2>
-              <p>Abra o video cadastrado para conferir detalhes visuais antes do contato com o consultor.</p>
+              <h2>Veja este veículo em movimento</h2>
+              <p>Abra o vídeo cadastrado para conferir detalhes visuais antes do contato com o consultor.</p>
             </div>
             <a class="btn btn-primary" [href]="car.videoUrl" target="_blank" rel="noopener">
               <iconify-icon icon="lucide:play"></iconify-icon>
-              Assistir video
+              Assistir vídeo
             </a>
           </section>
         }
 
         <section class="content-section">
-          <h2>Technical</h2>
+          <span class="eyebrow">Dados técnicos</span>
+          <h2>Performance e mecânica</h2>
           @if (car.technicalDescription) {
             <p>{{ car.technicalDescription }}</p>
           } @else {
-            <div class="empty-box">Descricao tecnica ainda nao cadastrada.</div>
+            <div class="empty-box">Descrição técnica ainda não cadastrada.</div>
           }
           <div class="technical-grid">
             <div>
-              <h3><iconify-icon icon="lucide:engine"></iconify-icon>Engine</h3>
+              <h3><iconify-icon icon="lucide:engine"></iconify-icon>Motor e conjunto</h3>
               <dl>
-                <div><dt>Layout</dt><dd>{{ car.engine || '-' }}</dd></div>
-                <div><dt>Fuel type</dt><dd>{{ car.fuel }}</dd></div>
-                <div><dt>Drive</dt><dd>{{ car.drive || '-' }}</dd></div>
+                <div><dt>Motor</dt><dd>{{ car.engine || 'Não informado' }}</dd></div>
+                <div><dt>Combustível</dt><dd>{{ car.fuel || 'Não informado' }}</dd></div>
+                <div><dt>Tração</dt><dd>{{ car.drive || 'Não informado' }}</dd></div>
               </dl>
             </div>
             <div>
               <h3><iconify-icon icon="lucide:gauge"></iconify-icon>Performance</h3>
               <dl>
-                <div><dt>Top speed</dt><dd>{{ car.topSpeed || '-' }}</dd></div>
+                <div><dt>Velocidade máxima</dt><dd>{{ car.topSpeed || 'Não informado' }}</dd></div>
                 <div><dt>0 - 100 km/h</dt><dd>{{ car.acceleration || '-' }}</dd></div>
-                <div><dt>Transmission</dt><dd>{{ car.transmission }}</dd></div>
+                <div><dt>Câmbio</dt><dd>{{ car.transmission || 'Não informado' }}</dd></div>
               </dl>
             </div>
           </div>
         </section>
 
         <section class="content-section">
-          <h2>Features & Options</h2>
+          <span class="eyebrow">Equipamentos</span>
+          <h2>Itens e diferenciais</h2>
           @if (features().length) {
             <div class="features-grid">
               @for (group of featureGroups(); track $index) {
@@ -97,69 +108,83 @@
               }
             </div>
           } @else {
-            <div class="empty-box">Nenhum item de feature cadastrado.</div>
+            <div class="empty-box">Nenhum item de equipamento cadastrado para este veículo.</div>
           }
         </section>
 
         <section class="content-section" id="contato">
-          <h2>Location & Contact</h2>
+          <span class="eyebrow">Atendimento Velvet</span>
+          <h2>Localização e contato</h2>
           <div class="location-box">
             <iconify-icon icon="lucide:map-pin"></iconify-icon>
             <div>
-              <strong>Velvet Motors</strong>
-              <p>Av. Europa, 000 - Sao Paulo, SP</p>
+              <strong>{{ siteContent().brandName }}</strong>
+              <p>{{ siteContent().address }}</p>
+              <small>{{ siteContent().hours }}</small>
             </div>
           </div>
-          <div class="contact-grid">
+          <div class="contact-cta">
             <div>
-              <h3><iconify-icon icon="lucide:mail"></iconify-icon>Contact information</h3>
-              <p>Fale com um consultor para receber proposta, laudo e condicoes de financiamento.</p>
+              <span>Atendimento imediato</span>
+              <h3><iconify-icon icon="logos:whatsapp-icon"></iconify-icon>Entrar em contato agora</h3>
+              <p>Fale com a Velvet no WhatsApp para confirmar disponibilidade, histórico, proposta e condição de troca deste {{ car.name }}.</p>
             </div>
-            <form>
-              <input type="text" placeholder="Seu nome">
-              <input type="tel" placeholder="Telefone">
-              <textarea placeholder="Tenho interesse neste veiculo."></textarea>
-              <button class="btn btn-primary" type="button">Enviar mensagem</button>
-            </form>
+            <a class="btn btn-primary" [href]="whatsappUrl(car)" target="_blank" rel="noopener">
+              <iconify-icon icon="logos:whatsapp-icon"></iconify-icon>
+              Falar no WhatsApp
+            </a>
           </div>
         </section>
       </main>
 
       <aside class="details-sidebar">
         <div class="price-card">
-          <span>Velvet price</span>
+          <span>Preço Velvet</span>
           <strong>{{ car.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
           <small>Faixa premium curada</small>
         </div>
-        <a class="contact-card contact-card--whatsapp" href="https://wa.me/5511999990000" target="_blank" rel="noopener">
-          <iconify-icon icon="lucide:message-circle"></iconify-icon>
+        <div class="sidebar-summary">
+          <span>Resumo do anúncio</span>
+          <strong>{{ car.year }} - {{ car.km | number:'1.0-0':'pt-BR' }} km</strong>
+          <small>{{ brandName(car) }} - {{ car.body || 'Carroceria não informada' }} - {{ car.fuel || 'Combustível não informado' }}</small>
+        </div>
+        <a class="contact-card contact-card--whatsapp" [href]="whatsappUrl(car)" target="_blank" rel="noopener">
+          <iconify-icon icon="logos:whatsapp-icon"></iconify-icon>
           Chat via WhatsApp
         </a>
-        <a class="contact-card" href="tel:+5511999990000">
+        <a class="contact-card" [href]="phoneHref()">
           <iconify-icon icon="lucide:phone"></iconify-icon>
-          (11) 99999-0000
+          {{ siteContent().phone }}
         </a>
-        <a class="contact-card" href="mailto:contato@velvetmotors.com.br">
+        <a class="contact-card" [href]="emailHref(car)">
           <iconify-icon icon="lucide:mail"></iconify-icon>
-          Message us
+          Enviar mensagem
         </a>
 
         <div class="spec-panel">
-          <div><span>Condition</span><strong>{{ car.condition || car.badge || '-' }}</strong></div>
-          <div><span>Body</span><strong>{{ car.body || 'Sedan' }}</strong></div>
-          <div><span>Make</span><strong>{{ car.brand || car.name.split(' ')[0] }}</strong></div>
-          <div><span>Fuel type</span><strong>{{ car.fuel }}</strong></div>
-          <div><span>Year</span><strong>{{ car.year }}</strong></div>
-          <div><span>Transmission</span><strong>{{ car.transmission }}</strong></div>
-          <div><span>Mileage</span><strong>{{ car.km | number:'1.0-0' }} km</strong></div>
-          <div><span>Exterior color</span><strong>{{ car.exteriorColor || 'Pearl White' }}</strong></div>
-          <div><span>Interior color</span><strong>{{ car.interiorColor || 'Jet Black' }}</strong></div>
+          <div><span>Condição</span><strong>{{ car.condition || car.badge || 'Não informada' }}</strong></div>
+          <div><span>Carroceria</span><strong>{{ car.body || 'Não informada' }}</strong></div>
+          <div><span>Marca</span><strong>{{ brandName(car) }}</strong></div>
+          <div><span>Combustível</span><strong>{{ car.fuel || 'Não informado' }}</strong></div>
+          <div><span>Ano</span><strong>{{ car.year }}</strong></div>
+          <div><span>Câmbio</span><strong>{{ car.transmission || 'Não informado' }}</strong></div>
+          <div><span>Quilometragem</span><strong>{{ car.km | number:'1.0-0':'pt-BR' }} km</strong></div>
+          <div><span>Cor externa</span><strong>{{ car.exteriorColor || 'Não informada' }}</strong></div>
+          <div><span>Cor interna</span><strong>{{ car.interiorColor || 'Não informada' }}</strong></div>
         </div>
 
-        <div class="mpg-card">
-          <span><strong>{{ car.cityMpg || '-' }}</strong>City MPG</span>
-          <iconify-icon icon="lucide:fuel"></iconify-icon>
-          <span><strong>{{ car.highwayMpg || '-' }}</strong>Hwy MPG</span>
+        @if (hasEfficiency(car)) {
+          <div class="mpg-card">
+            <span><strong>{{ car.cityMpg || '-' }}</strong>Cidade</span>
+            <iconify-icon icon="lucide:fuel"></iconify-icon>
+            <span><strong>{{ car.highwayMpg || '-' }}</strong>Estrada</span>
+          </div>
+        }
+
+        <div class="consultant-card">
+          <iconify-icon icon="lucide:headset"></iconify-icon>
+          <strong>Atendimento consultivo</strong>
+          <p>Receba detalhes de procedência, disponibilidade e possibilidades de troca para este veículo.</p>
         </div>
       </aside>
     </div>

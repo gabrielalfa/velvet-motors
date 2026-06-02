@@ -255,7 +255,9 @@ export class InventoryService {
           throw new Error(response.Message ?? response.message ?? 'Resposta administrativa invalida.');
         }
 
-        return response.map((vehicle) => this.normalizeVehicle(vehicle));
+        return response
+          .filter((vehicle) => !this.isDeletedVehicle(vehicle))
+          .map((vehicle) => this.normalizeVehicle(vehicle));
       }),
       catchError((error) => {
         console.error('Falha ao carregar veiculos administrativos da API Velvet/AdminVehicles. Tentando lista publica.', error);
@@ -319,10 +321,13 @@ export class InventoryService {
   }
 
   deleteVehicle(id: number, token: string): Observable<VelvetOperationResult> {
-    return this.http.post<VelvetOperationResult>(apiConfig.velvetDeleteVehicleUrl, { id, token }).pipe(
+    const endpoint = `${apiConfig.velvetDeleteVehicleUrl}?id=${id}&token=${encodeURIComponent(token)}`;
+
+    return this.http.post<VelvetOperationResult>(endpoint, {}).pipe(
       tap((result) => {
         if (this.operationSucceeded(result)) {
-          this.loadVehicles();
+          this.vehicles.update((items) => items.filter((vehicle) => vehicle.id !== id));
+          this.loadAdminVehicles(token);
         }
       })
     );
@@ -343,6 +348,18 @@ export class InventoryService {
     return this.http.post<VelvetOperationResult>(endpoint, body).pipe(
       tap((result) => {
         if (this.operationSucceeded(result)) {
+          if (banner.id > 0) {
+            const savedBanner = this.normalizeBanner({
+              ...body,
+              Id: banner.id,
+              SortOrder: body.sortOrder,
+              Active: body.active
+            });
+
+            this.banners.update((items) => items.map((item) => item.id === banner.id ? savedBanner : item));
+            return;
+          }
+
           this.loadBanners();
         }
       })
@@ -353,7 +370,7 @@ export class InventoryService {
     return this.http.post<VelvetOperationResult>(apiConfig.velvetDeleteBannerUrl, { id, token }).pipe(
       tap((result) => {
         if (this.operationSucceeded(result)) {
-          this.loadBanners();
+          this.banners.update((items) => items.filter((banner) => banner.id !== id));
         }
       })
     );
@@ -386,7 +403,7 @@ export class InventoryService {
       id: banner.Id ?? banner.id ?? 0,
       title: banner.Title ?? banner.title ?? '',
       headline: banner.Headline ?? banner.headline ?? '',
-      image: banner.Image ?? banner.image ?? '',
+      image: this.resolveMediaUrl(banner.Image ?? banner.image ?? ''),
       sortOrder: banner.SortOrder ?? banner.sortOrder ?? 0,
       active: banner.Active ?? banner.active ?? true
     };
@@ -427,6 +444,13 @@ export class InventoryService {
     };
   }
 
+  private isDeletedVehicle(vehicle: ApiVehicle): boolean {
+    const active = vehicle.Active ?? vehicle.active ?? true;
+    const listingStatus = (vehicle.ListingStatus ?? vehicle.listingStatus ?? '').trim();
+
+    return active === false && listingStatus === 'Publicado';
+  }
+
   private toVehicleRequest(vehicle: Vehicle, token: string): Record<string, string | number | boolean> {
     return {
       token,
@@ -463,9 +487,10 @@ export class InventoryService {
     };
   }
 
-  uploadVehicleMedia(file: File, token: string): Observable<VelvetOperationResult & { url?: string; Url?: string }> {
+  uploadVehicleMedia(file: File, token: string, scope = 'vehicles'): Observable<VelvetOperationResult & { url?: string; Url?: string }> {
     const formData = new FormData();
     formData.append('token', token);
+    formData.append('scope', scope);
     formData.append('file', file);
 
     return this.http.post<VelvetOperationResult & { url?: string; Url?: string }>(apiConfig.velvetUploadVehicleMediaUrl, formData);

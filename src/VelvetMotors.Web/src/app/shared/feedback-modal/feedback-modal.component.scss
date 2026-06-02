@@ -1,0 +1,113 @@
+.feedback-modal {
+  align-items: center;
+  backdrop-filter: blur(18px);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 239, 0.12), rgba(255, 248, 239, 0.055)),
+    rgba(12, 10, 8, 0.92);
+  border: 1px solid rgba(255, 248, 239, 0.16);
+  border-radius: 22px;
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.44);
+  color: #fff8ef;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 48px minmax(0, 1fr) 42px;
+  max-width: min(680px, calc(100vw - 36px));
+  padding: 18px;
+  position: fixed;
+  right: 24px;
+  top: 24px;
+  z-index: 200;
+}
+
+.feedback-modal--success {
+  border-color: rgba(222, 169, 72, 0.42);
+}
+
+.feedback-modal--error {
+  border-color: rgba(255, 105, 86, 0.46);
+}
+
+.feedback-modal__icon {
+  align-items: center;
+  background: rgba(255, 248, 239, 0.08);
+  border-radius: 16px;
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.feedback-modal__icon iconify-icon {
+  color: var(--accent-hover);
+  font-size: 1.45rem;
+}
+
+.feedback-modal--error .feedback-modal__icon iconify-icon {
+  color: #ff8f7c;
+}
+
+.feedback-modal strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.02rem;
+  margin-bottom: 4px;
+}
+
+.feedback-modal p {
+  color: rgba(255, 248, 239, 0.68);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.feedback-modal button {
+  align-items: center;
+  background: rgba(255, 248, 239, 0.06);
+  border: 1px solid rgba(255, 248, 239, 0.16);
+  border-radius: 999px;
+  color: #fff8ef;
+  cursor: pointer;
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  position: relative;
+  width: 42px;
+}
+
+.feedback-modal button span {
+  animation: feedbackCountdown 5s linear forwards;
+  border: 2px solid rgba(255, 248, 239, 0.22);
+  border-right-color: var(--accent-hover);
+  border-radius: 50%;
+  inset: 4px;
+  position: absolute;
+}
+
+.feedback-modal--error button span {
+  border-right-color: #ff8f7c;
+}
+
+.feedback-modal button iconify-icon {
+  font-size: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes feedbackCountdown {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .feedback-modal {
+    grid-template-columns: 42px minmax(0, 1fr) 38px;
+    left: 14px;
+    right: 14px;
+    top: 14px;
+  }
+}

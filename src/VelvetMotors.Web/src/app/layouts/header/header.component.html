@@ -5,13 +5,13 @@
 
   <nav class="desktop-nav" aria-label="Navegacao principal">
     @for (item of navItems; track item.label) {
-      <a [href]="item.href">
+      <a [href]="item.href" (click)="item.scrollTarget ? scrollToSection($event, item.scrollTarget) : null">
         {{ item.label }}
       </a>
     }
   </nav>
 
-  <a class="header-cta" href="/#contato">
+  <a class="header-cta" href="#contato" (click)="scrollToSection($event, 'contato')">
     <iconify-icon icon="lucide:calendar-check"></iconify-icon>
     {{ content().headerCtaLabel }}
   </a>
@@ -25,8 +25,8 @@
 <div class="mobile-panel" [class.mobile-panel--open]="menuOpen()">
   <div class="mobile-panel__surface">
     @for (item of navItems; track item.label) {
-      <a [href]="item.href" (click)="closeMenu()">{{ item.label }}</a>
+      <a [href]="item.href" (click)="item.scrollTarget ? scrollToSection($event, item.scrollTarget) : closeMenu()">{{ item.label }}</a>
     }
-    <a class="btn btn-primary" href="#contato" (click)="closeMenu()">{{ content().mobileCtaLabel }}</a>
+    <a class="btn btn-primary" href="#contato" (click)="scrollToSection($event, 'contato')">{{ content().mobileCtaLabel }}</a>
   </div>
 </div>

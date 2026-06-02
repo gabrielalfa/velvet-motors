@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { ProposalDraft } from '../../models/proposal.model';
 import { ProposalService } from '../../services/proposal.service';
 import { SiteContentService } from '../../services/site-content.service';
+import { FeedbackModalComponent, FeedbackType } from '../../shared/feedback-modal/feedback-modal.component';
 
 @Component({
   selector: 'app-sell-your-car',
-  imports: [FormsModule, RouterLink],
+  imports: [FeedbackModalComponent, FormsModule, RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './sell-your-car.component.html',
   styleUrl: './sell-your-car.component.scss'
@@ -18,6 +19,7 @@ export class SellYourCarComponent {
   readonly content = this.siteContentService.content;
   readonly sending = signal(false);
   readonly feedback = signal('');
+  readonly feedbackType = signal<FeedbackType>('info');
   readonly proposal: ProposalDraft = {
     proposalType: 'sell',
     make: '',
@@ -48,6 +50,7 @@ export class SellYourCarComponent {
 
     this.proposalService.insertProposal(this.proposal).subscribe((result) => {
       this.sending.set(false);
+      this.feedbackType.set(this.proposalService.succeeded(result) ? 'success' : 'error');
       this.feedback.set(this.proposalService.message(result) || 'Proposta enviada com sucesso.');
 
       if (this.proposalService.succeeded(result)) {
@@ -74,5 +77,10 @@ export class SellYourCarComponent {
       customerPhone: '',
       message: ''
     });
+  }
+
+  clearFeedback(): void {
+    this.feedback.set('');
+    this.feedbackType.set('info');
   }
 }

@@ -47,15 +47,7 @@
       </div>
     </header>
 
-    @if (feedback()) {
-      <div class="admin-feedback" role="status">
-        <p>{{ feedback() }}</p>
-        <button type="button" aria-label="Fechar mensagem" (click)="clearFeedback()">
-          <span></span>
-          <iconify-icon icon="lucide:x"></iconify-icon>
-        </button>
-      </div>
-    }
+    <app-feedback-modal [message]="feedback()" [type]="feedbackType()" (closed)="clearFeedback()"></app-feedback-modal>
 
     @if (activeView() === 'dashboard') {
       <section class="metric-grid">
@@ -393,7 +385,7 @@
 
                 @if (vehicleEditorStep() === 'features') {
                   <div class="form-grid">
-                    <label class="span-2">Features & Options <textarea name="vehicleFeatures" [(ngModel)]="editingVehicle.featuresOptions" placeholder="Uma feature por linha. Ex: Bancos em couro"></textarea></label>
+                    <label class="span-2">Itens e opcionais <textarea name="vehicleFeatures" [(ngModel)]="editingVehicle.featuresOptions" placeholder="Um item por linha. Ex: Bancos em couro"></textarea></label>
                   </div>
                 }
               </section>
@@ -525,7 +517,7 @@
     }
 
     @if (activeView() === 'showcase') {
-      <section class="panel-card showcase-manager">
+      <section class="panel-card showcase-manager" data-testid="showcase-manager">
         <div class="panel-heading">
           <div>
             <span class="eyebrow">Carrossel inicial</span>
@@ -563,7 +555,7 @@
 
         <div class="showcase-editor">
           <div class="showcase-preview">
-            <img [src]="editingBanner.image" [alt]="editingBanner.title || 'Preview do banner'">
+            <img data-testid="banner-editor-preview" [src]="editingBanner.image" [alt]="editingBanner.title || 'Preview do banner'">
             <div>
               <span>{{ siteContent().heroEyebrow }}</span>
               <strong>{{ siteContent().heroTitle }}</strong>
@@ -583,7 +575,17 @@
                 </select>
               </label>
               <label class="span-2">Imagem do banner
-                <input name="bannerImage" [(ngModel)]="editingBanner.image" placeholder="/images/banner/1.png">
+                <span class="media-dropzone banner-upload-field">
+                  <input
+                    data-testid="banner-form-upload-input"
+                    type="file"
+                    accept="image/png,image/jpeg"
+                    [disabled]="saving()"
+                    (change)="uploadBannerImage($event)">
+                  <iconify-icon icon="lucide:image-up"></iconify-icon>
+                  <strong>{{ pendingBannerImageName() || 'Selecionar nova imagem' }}</strong>
+                  <span>{{ pendingBannerImageName() ? 'Preview carregado. Salve para enviar ao servidor.' : 'PNG ou JPG, ate 1 MB. Use uma foto horizontal.' }}</span>
+                </span>
               </label>
             </div>
             <div class="editor-actions">
@@ -592,7 +594,7 @@
                 Editar texto fixo
               </button>
               <button class="ghost-action" type="button" (click)="newBanner()">Limpar formulario</button>
-              <button class="primary-action" type="submit" [disabled]="saving()">
+              <button class="primary-action" data-testid="save-banner-button" type="submit" [disabled]="saving()">
                 <iconify-icon icon="lucide:save"></iconify-icon>
                 {{ saving() ? 'Salvando...' : 'Salvar banner no site' }}
               </button>
@@ -602,22 +604,22 @@
 
         <div class="showcase-grid">
           @for (banner of sortedBanners(); track banner.id) {
-            <article [class.is-paused]="!(banner.active ?? true)">
+            <article data-testid="banner-card" [attr.data-banner-id]="banner.id" [class.is-paused]="!(banner.active ?? true)">
               <img [src]="banner.image" [alt]="banner.title">
               <div>
                 <span>Banner {{ banner.sortOrder || banner.id }} - {{ (banner.active ?? true) ? 'Publicado' : 'Pausado' }}</span>
                 <strong>Imagem do carrossel inicial</strong>
-                <small>{{ banner.image }}</small>
+                <small>Clique em editar para substituir a foto. PNG/JPG ate 1 MB.</small>
                 <div class="showcase-card-actions">
-                  <button type="button" (click)="editBanner(banner)">
-                    <iconify-icon icon="lucide:pencil"></iconify-icon>
+                  <button class="ghost-action" data-testid="edit-banner-button" type="button" (click)="editBanner(banner)">
+                    <iconify-icon icon="lucide:image-up"></iconify-icon>
                     Editar
                   </button>
-                  <button type="button" (click)="toggleBannerStatus(banner)">
+                  <button type="button" data-testid="toggle-banner-status-button" (click)="toggleBannerStatus(banner)">
                     <iconify-icon [icon]="(banner.active ?? true) ? 'lucide:pause' : 'lucide:play'"></iconify-icon>
                     {{ (banner.active ?? true) ? 'Pausar' : 'Publicar' }}
                   </button>
-                  <button class="danger-action" type="button" (click)="deleteBanner(banner)">
+                  <button class="danger-action" data-testid="delete-banner-button" type="button" (click)="deleteBanner(banner)">
                     <iconify-icon icon="lucide:trash-2"></iconify-icon>
                     Remover
                   </button>
@@ -644,7 +646,7 @@
             <span class="eyebrow">Pagina de comparacao</span>
             <h2>Campos do comparador do comprador</h2>
           </div>
-          <button class="primary-action" type="button" (click)="showFeedback('Regras de comparacao atualizadas para o preview do painel.')">
+          <button class="primary-action" type="button" (click)="showFeedback('Regras de comparacao atualizadas para o preview do painel.', 'success')">
             <iconify-icon icon="lucide:save"></iconify-icon>
             Atualizar regras
           </button>

@@ -1,7 +1,7 @@
-import { CurrencyPipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CompareService } from '../../services/compare.service';
 import { InventoryService } from '../../services/inventory.service';
 import { Vehicle } from '../../models/vehicle.model';
@@ -14,7 +14,9 @@ import { Vehicle } from '../../models/vehicle.model';
   styleUrl: './fleet-page.component.scss'
 })
 export class FleetPageComponent {
+  private readonly document = inject(DOCUMENT);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly inventoryService = inject(InventoryService);
   readonly compareService = inject(CompareService);
   readonly vehicles = this.inventoryService.vehicles;
@@ -35,6 +37,7 @@ export class FleetPageComponent {
   readonly visibleLimit = signal(10);
   readonly pageSize = 10;
   readonly compareFeedback = signal('');
+  readonly sharedVehicleId = signal<number | null>(null);
 
   readonly brands = computed(() => ['Todos', ...new Set(this.vehicles().map((vehicle) => vehicle.name.split(' ')[0]))]);
   readonly years = computed(() => ['Todos', ...new Set(this.vehicles().map((vehicle) => String(vehicle.year)))]);
@@ -206,14 +209,41 @@ export class FleetPageComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    const changed = this.compareService.toggle(vehicle.id);
+    const changed = this.compareService.add(vehicle.id);
 
     if (!changed) {
       this.compareFeedback.set('Voce pode comparar ate 3 veiculos por vez.');
       return;
     }
 
-    this.compareFeedback.set(this.compareService.isSelected(vehicle.id) ? 'Veiculo adicionado a comparacao.' : 'Veiculo removido da comparacao.');
+    this.router.navigateByUrl('/comparar');
+  }
+
+  async shareVehicle(vehicle: Vehicle, event: Event): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const shareUrl = this.vehicleShareUrl(vehicle);
+    const shareTitle = `${vehicle.name} | Velvet Motors`;
+    const shareText = `Confira este ${vehicle.name} ${vehicle.year} na Velvet Motors.`;
+    const navigator = this.document.defaultView?.navigator;
+
+    try {
+      if (navigator?.share) {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl
+        });
+        this.setSharedVehicle(vehicle.id);
+        return;
+      }
+
+      await this.copyToClipboard(shareUrl);
+      this.setSharedVehicle(vehicle.id);
+    } catch {
+      this.compareFeedback.set('Nao foi possivel gerar o link de compartilhamento agora.');
+    }
   }
 
   resolveBody(vehicle: Vehicle): string {
@@ -234,5 +264,39 @@ export class FleetPageComponent {
 
   private resetPage(): void {
     this.visibleLimit.set(this.pageSize);
+  }
+
+  private vehicleShareUrl(vehicle: Vehicle): string {
+    const origin = this.document.location.origin;
+
+    return `${origin}/veiculo/${vehicle.id}`;
+  }
+
+  private async copyToClipboard(value: string): Promise<void> {
+    const navigator = this.document.defaultView?.navigator;
+
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return;
+    }
+
+    const input = this.document.createElement('textarea');
+    input.value = value;
+    input.setAttribute('readonly', 'true');
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    this.document.body.appendChild(input);
+    input.select();
+    this.document.execCommand('copy');
+    this.document.body.removeChild(input);
+  }
+
+  private setSharedVehicle(vehicleId: number): void {
+    this.sharedVehicleId.set(vehicleId);
+    this.document.defaultView?.setTimeout(() => {
+      if (this.sharedVehicleId() === vehicleId) {
+        this.sharedVehicleId.set(null);
+      }
+    }, 4500);
   }
 }

@@ -81,5 +81,10 @@ test.describe.serial('Painel administrativo - veiculos', () => {
 
     await row.getByTestId('delete-vehicle-button').click();
     await expect(row).toBeHidden();
+
+    await page.reload();
+    await openVehicles(page);
+    await page.getByTestId('vehicle-search-input').fill(editedVehicleName);
+    await expect(page.getByTestId('admin-vehicle-row').filter({ hasText: editedVehicleName })).toBeHidden();
   });
 });

@@ -6,9 +6,11 @@
       </div>
       <p>{{ content().footerDescription }}</p>
       <div class="socials">
-        <a [href]="content().instagramUrl" aria-label="Instagram">IG</a>
-        <a [href]="content().linkedinUrl" aria-label="LinkedIn">IN</a>
-        <a [href]="content().youtubeUrl" aria-label="YouTube">YT</a>
+        @for (social of socialLinks(); track social.label) {
+          <a [href]="social.url" [attr.aria-label]="social.label" target="_blank" rel="noopener">
+            <iconify-icon [icon]="social.icon"></iconify-icon>
+          </a>
+        }
       </div>
     </div>
     <div>

@@ -49,10 +49,21 @@ h3 {
   border-radius: 50%;
   color: var(--text-primary);
   display: inline-flex;
-  font-size: 0.75rem;
   height: 40px;
   justify-content: center;
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease, transform 220ms ease;
   width: 40px;
+}
+
+.socials a:hover {
+  background: rgba(183, 110, 61, 0.16);
+  border-color: rgba(255, 224, 129, 0.42);
+  color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.socials iconify-icon {
+  font-size: 1.05rem;
 }
 
 @media (max-width: 780px) {

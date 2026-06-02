@@ -1,0 +1,15 @@
+@if (message) {
+  <section class="feedback-modal" [class.feedback-modal--error]="type === 'error'" [class.feedback-modal--success]="type === 'success'" role="status" aria-live="polite">
+    <div class="feedback-modal__icon">
+      <iconify-icon [icon]="icon"></iconify-icon>
+    </div>
+    <div>
+      <strong>{{ title }}</strong>
+      <p>{{ message }}</p>
+    </div>
+    <button type="button" aria-label="Fechar mensagem" (click)="close()">
+      <span></span>
+      <iconify-icon icon="lucide:x"></iconify-icon>
+    </button>
+  </section>
+}

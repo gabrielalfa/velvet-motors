@@ -22,7 +22,7 @@ export class HeaderComponent {
     { label: 'Veiculos', href: '/veiculos' },
     { label: 'Avaliação', href: '/vender-seu-carro' },
     { label: 'Diferenciais', href: '/#diferenciais' },
-    { label: 'Contato', href: '/#contato' }
+    { label: 'Contato', href: '#contato', scrollTarget: 'contato' }
   ];
 
   @HostListener('window:scroll')
@@ -38,5 +38,15 @@ export class HeaderComponent {
   closeMenu(): void {
     this.menuOpen.set(false);
     this.document.body.classList.remove('nav-open');
+  }
+
+  scrollToSection(event: Event, targetId: string): void {
+    event.preventDefault();
+    this.closeMenu();
+
+    this.document.getElementById(targetId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 }

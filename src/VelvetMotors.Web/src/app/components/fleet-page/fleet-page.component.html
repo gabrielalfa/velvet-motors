@@ -124,7 +124,13 @@
                     <iconify-icon icon="lucide:git-compare"></iconify-icon>
                     {{ compareService.isSelected(vehicle.id) ? 'Selecionado' : 'Comparar' }}
                   </button>
-                  <button type="button"><iconify-icon icon="lucide:share-2"></iconify-icon>Compartilhar</button>
+                  <button
+                    type="button"
+                    [class.is-copied]="sharedVehicleId() === vehicle.id"
+                    (click)="shareVehicle(vehicle, $event)">
+                    <iconify-icon [icon]="sharedVehicleId() === vehicle.id ? 'lucide:check' : 'lucide:share-2'"></iconify-icon>
+                    {{ sharedVehicleId() === vehicle.id ? 'Link copiado' : 'Compartilhar' }}
+                  </button>
                   <strong>Certificado Velvet</strong>
                 </div>
                 <a class="fleet-card__details" [routerLink]="['/veiculo', vehicle.id]">
