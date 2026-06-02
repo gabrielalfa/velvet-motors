@@ -5,10 +5,10 @@
         <iconify-icon icon="lucide:arrow-left"></iconify-icon>
         Voltar
       </a>
-      <span class="eyebrow">Avaliacao Velvet</span>
-      <h1>Sell your vehicle</h1>
+      <span class="eyebrow">{{ content().sellEyebrow }}</span>
+      <h1>{{ content().sellTitle }}</h1>
       <i></i>
-      <p>Informe os dados do seu veiculo para receber uma estimativa inicial e conversar com um consultor Velvet.</p>
+      <p>{{ content().sellDescription }}</p>
       <p>Apos a analise, voce decide entre venda direta, troca ou consignacao premium.</p>
     </aside>
 
@@ -23,62 +23,83 @@
         }
       </div>
 
-      <form>
+      @if (feedback()) {
+        <p class="proposal-feedback">{{ feedback() }}</p>
+      }
+
+      <form (ngSubmit)="submitProposal()">
         <label>
-          <span>Make</span>
-          <input type="text" placeholder="BMW, Audi, Mercedes">
+          <span>Marca</span>
+          <input type="text" placeholder="BMW, Audi, Mercedes" name="make" [(ngModel)]="proposal.make" required>
         </label>
         <label>
-          <span>Model</span>
-          <input type="text" placeholder="Modelo">
+          <span>Modelo</span>
+          <input type="text" placeholder="Modelo" name="model" [(ngModel)]="proposal.model" required>
         </label>
         <label>
-          <span>Year</span>
-          <input type="number" placeholder="2022">
+          <span>Ano</span>
+          <input type="number" placeholder="2022" name="year" [(ngModel)]="proposal.year" required>
         </label>
         <label>
-          <span>Transmission</span>
-          <input type="text" placeholder="Automatico">
+          <span>Transmissao</span>
+          <input type="text" placeholder="Automatico" name="transmission" [(ngModel)]="proposal.transmission">
         </label>
         <label>
-          <span>Mileage</span>
-          <input type="number" placeholder="32000">
+          <span>Quilometragem</span>
+          <input type="number" placeholder="32000" name="mileage" [(ngModel)]="proposal.mileage">
         </label>
         <label>
           <span>VIN</span>
-          <input type="text" placeholder="Opcional">
+          <input type="text" placeholder="Opcional" name="vin" [(ngModel)]="proposal.vin">
         </label>
 
         <div class="upload-row">
           <label>
-            <span>Upload your car photos</span>
+            <span>Fotos do veiculo</span>
             <button type="button">
               <iconify-icon icon="lucide:paperclip"></iconify-icon>
-              Choose file...
+              Selecionar arquivos
             </button>
           </label>
           <label>
-            <span>Provide a hosted video url of your car</span>
-            <input type="url" placeholder="https://">
+            <span>Video do veiculo</span>
+            <input type="url" placeholder="https://" name="videoUrl" [(ngModel)]="proposal.videoUrl">
           </label>
         </div>
 
         <label>
-          <span>Exterior color</span>
-          <input type="text" placeholder="Pearl white">
+          <span>Cor externa</span>
+          <input type="text" placeholder="Preto, branco, prata..." name="exteriorColor" [(ngModel)]="proposal.exteriorColor">
         </label>
         <label>
-          <span>Interior color</span>
-          <input type="text" placeholder="Jet black">
+          <span>Cor interna</span>
+          <input type="text" placeholder="Couro preto, caramelo..." name="interiorColor" [(ngModel)]="proposal.interiorColor">
         </label>
         <label>
-          <span>Owner</span>
-          <input type="text" placeholder="Unico dono">
+          <span>Historico</span>
+          <input type="text" placeholder="Unico dono, revisoes, observacoes" name="history" [(ngModel)]="proposal.history">
         </label>
 
-        <button class="btn btn-primary" type="button">
+        <label>
+          <span>Seu nome</span>
+          <input type="text" placeholder="Nome completo" name="customerName" [(ngModel)]="proposal.customerName" required>
+        </label>
+        <label>
+          <span>E-mail</span>
+          <input type="email" placeholder="voce@email.com" name="customerEmail" [(ngModel)]="proposal.customerEmail">
+        </label>
+        <label>
+          <span>Telefone / WhatsApp</span>
+          <input type="tel" placeholder="(11) 99999-0000" name="customerPhone" [(ngModel)]="proposal.customerPhone" required>
+        </label>
+        <label class="span-full">
+          <span>Mensagem</span>
+          <textarea placeholder="Conte um pouco sobre o veiculo e seu objetivo." name="message" [(ngModel)]="proposal.message"></textarea>
+        </label>
+
+        <button class="btn btn-primary" type="submit" [disabled]="sending()">
           <iconify-icon icon="lucide:save"></iconify-icon>
-          Save and continue
+          {{ sending() ? 'Enviando...' : 'Enviar avaliacao' }}
         </button>
       </form>
     </main>

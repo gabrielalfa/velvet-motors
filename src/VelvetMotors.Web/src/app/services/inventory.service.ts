@@ -1,14 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, map, of } from 'rxjs';
+import { catchError, finalize, map, Observable, of, tap } from 'rxjs';
 import { apiConfig } from '../config/api.config';
-import { BrandLogo, Difference, HeroBanner, Vehicle, VelvetHomeResponse } from '../models/vehicle.model';
+import { SiteContent } from '../models/site-content.model';
+import { BrandLogo, Difference, HeroBanner, Vehicle, VelvetHomeResponse, VelvetOperationResult } from '../models/vehicle.model';
+import { SiteContentService } from './site-content.service';
 
 type ApiHomeResponse = {
   Banners?: ApiBanner[];
   FeaturedCars?: ApiVehicle[];
+  SiteContent?: Partial<SiteContent> & Record<string, unknown>;
   banners?: ApiBanner[];
   featuredCars?: ApiVehicle[];
+  siteContent?: Partial<SiteContent> & Record<string, unknown>;
 };
 
 type ApiBanner = {
@@ -16,10 +20,14 @@ type ApiBanner = {
   Title?: string;
   Headline?: string;
   Image?: string;
+  SortOrder?: number;
+  Active?: boolean;
   id?: number;
   title?: string;
   headline?: string;
   image?: string;
+  sortOrder?: number;
+  active?: boolean;
 };
 
 type ApiVehicle = {
@@ -29,18 +37,60 @@ type ApiVehicle = {
   Km?: number;
   Price?: number;
   Image?: string;
+  GalleryImages?: string;
+  VideoUrl?: string;
   Badge?: string;
+  Brand?: string;
+  Condition?: string;
+  DisplayTag?: string;
+  ListingStatus?: string;
   Transmission?: string;
   Fuel?: string;
+  Body?: string;
+  Engine?: string;
+  Drive?: string;
+  Description?: string;
+  TechnicalDescription?: string;
+  FeaturesOptions?: string;
+  CityMpg?: number;
+  HighwayMpg?: number;
+  TopSpeed?: string;
+  Acceleration?: string;
+  ExteriorColor?: string;
+  InteriorColor?: string;
+  Featured?: boolean;
+  Active?: boolean;
+  SortOrder?: number;
   id?: number;
   name?: string;
   year?: number;
   km?: number;
   price?: number;
   image?: string;
+  galleryImages?: string;
+  videoUrl?: string;
   badge?: string;
+  brand?: string;
+  condition?: string;
+  displayTag?: string;
+  listingStatus?: string;
   transmission?: string;
   fuel?: string;
+  body?: string;
+  engine?: string;
+  drive?: string;
+  description?: string;
+  technicalDescription?: string;
+  featuresOptions?: string;
+  cityMpg?: number;
+  highwayMpg?: number;
+  topSpeed?: string;
+  acceleration?: string;
+  exteriorColor?: string;
+  interiorColor?: string;
+  featured?: boolean;
+  active?: boolean;
+  sortOrder?: number;
 };
 
 const fallbackBanners: HeroBanner[] = [
@@ -125,10 +175,12 @@ const fallbackVehicles: Vehicle[] = [
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
   private readonly http = inject(HttpClient);
+  private readonly siteContentService = inject(SiteContentService);
 
   readonly loading = signal(true);
   readonly banners = signal<HeroBanner[]>(fallbackBanners);
   readonly vehicles = signal<Vehicle[]>(fallbackVehicles);
+  readonly selectedVehicle = signal<Vehicle | null>(null);
 
   readonly brands: BrandLogo[] = [
     { name: 'BMW' },
@@ -155,7 +207,7 @@ export class InventoryService {
     {
       icon: 'diamond',
       title: 'Veiculos selecionados',
-      description: 'Estoque enxuto, elegante e focado em carros com presenca, estado e liquidez.'
+      description: 'Selecao enxuta, elegante e focada em carros com presenca, estado e liquidez.'
     }
   ];
 
@@ -169,39 +221,285 @@ export class InventoryService {
 
         return of({
           banners: fallbackBanners,
-          featuredCars: []
-        });
+          featuredCars: [],
+          siteContent: undefined
+        } satisfies VelvetHomeResponse);
       }),
       finalize(() => this.loading.set(false))
     ).subscribe((homeData) => {
+      if (homeData.siteContent) {
+        this.siteContentService.applyRemoteContent(homeData.siteContent);
+      }
+
       this.banners.set(homeData.banners.length ? homeData.banners : fallbackBanners);
-      this.vehicles.set(homeData.featuredCars);
+      this.vehicles.set(homeData.featuredCars.length ? homeData.featuredCars : fallbackVehicles);
     });
+  }
+
+  loadVehicles(): void {
+    this.loading.set(true);
+
+    this.getVehicles().pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe((vehicles) => {
+      this.vehicles.set(vehicles.length ? vehicles : fallbackVehicles);
+    });
+  }
+
+  loadAdminVehicles(token: string): void {
+    this.loading.set(true);
+
+    this.http.post<ApiVehicle[] | VelvetOperationResult>(apiConfig.velvetAdminVehiclesUrl, { token }).pipe(
+      map((response) => {
+        if (!Array.isArray(response)) {
+          throw new Error(response.Message ?? response.message ?? 'Resposta administrativa invalida.');
+        }
+
+        return response.map((vehicle) => this.normalizeVehicle(vehicle));
+      }),
+      catchError((error) => {
+        console.error('Falha ao carregar veiculos administrativos da API Velvet/AdminVehicles. Tentando lista publica.', error);
+        return this.getVehicles();
+      }),
+      finalize(() => this.loading.set(false))
+    ).subscribe((vehicles) => {
+      this.vehicles.set(vehicles);
+    });
+  }
+
+  loadBanners(): void {
+    this.http.get<ApiBanner[]>(apiConfig.velvetBannersUrl).pipe(
+      map((banners) => banners.map((banner) => this.normalizeBanner(banner))),
+      catchError((error) => {
+        console.error('Falha ao carregar banners da API Velvet/Banners.', error);
+        return of(fallbackBanners);
+      })
+    ).subscribe((banners) => this.banners.set(banners.length ? banners : fallbackBanners));
+  }
+
+  loadVehicle(id: number): void {
+    this.loading.set(true);
+
+    this.getVehicle(id).pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe((vehicle) => this.selectedVehicle.set(vehicle));
+  }
+
+  getVehicles(): Observable<Vehicle[]> {
+    return this.http.get<ApiVehicle[]>(apiConfig.velvetVehiclesUrl).pipe(
+      map((vehicles) => vehicles.map((vehicle) => this.normalizeVehicle(vehicle))),
+      catchError((error) => {
+        console.error('Falha ao carregar veiculos da API Velvet/Vehicles.', error);
+        return of(fallbackVehicles);
+      })
+    );
+  }
+
+  getVehicle(id: number): Observable<Vehicle | null> {
+    return this.http.get<ApiVehicle | VelvetOperationResult>(`${apiConfig.velvetVehicleUrl}?id=${id}`).pipe(
+      map((response) => this.isOperationFailure(response) ? null : this.normalizeVehicle(response as ApiVehicle)),
+      catchError((error) => {
+        console.error('Falha ao carregar veiculo da API Velvet/Vehicle.', error);
+        return of(fallbackVehicles.find((vehicle) => vehicle.id === id) ?? null);
+      })
+    );
+  }
+
+  saveVehicle(vehicle: Vehicle, token: string, reloadPublicList = true): Observable<VelvetOperationResult> {
+    const endpoint = vehicle.id > 0 ? apiConfig.velvetUpdateVehicleUrl : apiConfig.velvetInsertVehicleUrl;
+    const body = this.toVehicleRequest(vehicle, token);
+
+    return this.http.post<VelvetOperationResult>(endpoint, body).pipe(
+      tap((result) => {
+        if (reloadPublicList && this.operationSucceeded(result)) {
+          this.loadVehicles();
+        }
+      })
+    );
+  }
+
+  deleteVehicle(id: number, token: string): Observable<VelvetOperationResult> {
+    return this.http.post<VelvetOperationResult>(apiConfig.velvetDeleteVehicleUrl, { id, token }).pipe(
+      tap((result) => {
+        if (this.operationSucceeded(result)) {
+          this.loadVehicles();
+        }
+      })
+    );
+  }
+
+  saveBanner(banner: HeroBanner, token: string): Observable<VelvetOperationResult> {
+    const endpoint = banner.id > 0 ? apiConfig.velvetUpdateBannerUrl : apiConfig.velvetInsertBannerUrl;
+    const body = {
+      token,
+      id: banner.id,
+      title: banner.title,
+      headline: banner.headline,
+      image: banner.image,
+      sortOrder: banner.sortOrder ?? banner.id,
+      active: banner.active ?? true
+    };
+
+    return this.http.post<VelvetOperationResult>(endpoint, body).pipe(
+      tap((result) => {
+        if (this.operationSucceeded(result)) {
+          this.loadBanners();
+        }
+      })
+    );
+  }
+
+  deleteBanner(id: number, token: string): Observable<VelvetOperationResult> {
+    return this.http.post<VelvetOperationResult>(apiConfig.velvetDeleteBannerUrl, { id, token }).pipe(
+      tap((result) => {
+        if (this.operationSucceeded(result)) {
+          this.loadBanners();
+        }
+      })
+    );
+  }
+
+  operationSucceeded(result: VelvetOperationResult): boolean {
+    return result.Success ?? result.success ?? false;
+  }
+
+  operationMessage(result: VelvetOperationResult): string {
+    return result.Message ?? result.message ?? '';
   }
 
   private normalizeHomeResponse(response: ApiHomeResponse): VelvetHomeResponse {
     const banners = response.Banners ?? response.banners ?? [];
     const featuredCars = response.FeaturedCars ?? response.featuredCars ?? [];
+    const siteContent = response.SiteContent ?? response.siteContent;
 
     return {
       banners: banners.map((banner) => ({
-        id: banner.Id ?? banner.id ?? 0,
-        title: banner.Title ?? banner.title ?? '',
-        headline: banner.Headline ?? banner.headline ?? '',
-        image: banner.Image ?? banner.image ?? ''
+        ...this.normalizeBanner(banner)
       })),
-      featuredCars: featuredCars.map((vehicle) => ({
-        id: vehicle.Id ?? vehicle.id ?? 0,
-        name: vehicle.Name ?? vehicle.name ?? '',
-        year: vehicle.Year ?? vehicle.year ?? new Date().getFullYear(),
-        km: vehicle.Km ?? vehicle.km ?? 0,
-        price: vehicle.Price ?? vehicle.price ?? 0,
-        image: vehicle.Image ?? vehicle.image ?? '',
-        badge: vehicle.Badge ?? vehicle.badge ?? 'Destaque Velvet',
-        transmission: vehicle.Transmission ?? vehicle.transmission ?? 'Automatico',
-        fuel: vehicle.Fuel ?? vehicle.fuel ?? 'Flex'
-      }))
+      featuredCars: featuredCars.map((vehicle) => this.normalizeVehicle(vehicle)),
+      siteContent: siteContent ? this.siteContentService.normalizeContent(siteContent) : undefined
     };
   }
 
+  private normalizeBanner(banner: ApiBanner): HeroBanner {
+    return {
+      id: banner.Id ?? banner.id ?? 0,
+      title: banner.Title ?? banner.title ?? '',
+      headline: banner.Headline ?? banner.headline ?? '',
+      image: banner.Image ?? banner.image ?? '',
+      sortOrder: banner.SortOrder ?? banner.sortOrder ?? 0,
+      active: banner.Active ?? banner.active ?? true
+    };
+  }
+
+  private normalizeVehicle(vehicle: ApiVehicle): Vehicle {
+    return {
+      id: vehicle.Id ?? vehicle.id ?? 0,
+      name: vehicle.Name ?? vehicle.name ?? '',
+      year: vehicle.Year ?? vehicle.year ?? new Date().getFullYear(),
+      km: vehicle.Km ?? vehicle.km ?? 0,
+      price: vehicle.Price ?? vehicle.price ?? 0,
+      image: this.resolveMediaUrl(vehicle.Image ?? vehicle.image ?? ''),
+      galleryImages: this.resolveGalleryUrls(vehicle.GalleryImages ?? vehicle.galleryImages ?? ''),
+      videoUrl: vehicle.VideoUrl ?? vehicle.videoUrl ?? '',
+      badge: vehicle.Badge ?? vehicle.badge ?? 'Destaque Velvet',
+      brand: vehicle.Brand ?? vehicle.brand ?? '',
+      condition: vehicle.Condition ?? vehicle.condition ?? '',
+      displayTag: vehicle.DisplayTag ?? vehicle.displayTag ?? vehicle.Badge ?? vehicle.badge ?? '',
+      listingStatus: vehicle.ListingStatus ?? vehicle.listingStatus ?? ((vehicle.Active ?? vehicle.active ?? true) ? 'Publicado' : 'Rascunho'),
+      transmission: vehicle.Transmission ?? vehicle.transmission ?? 'Automatico',
+      fuel: vehicle.Fuel ?? vehicle.fuel ?? 'Flex',
+      body: vehicle.Body ?? vehicle.body ?? 'Sedan',
+      engine: vehicle.Engine ?? vehicle.engine ?? '',
+      drive: vehicle.Drive ?? vehicle.drive ?? '',
+      description: vehicle.Description ?? vehicle.description ?? '',
+      technicalDescription: vehicle.TechnicalDescription ?? vehicle.technicalDescription ?? '',
+      featuresOptions: vehicle.FeaturesOptions ?? vehicle.featuresOptions ?? '',
+      cityMpg: vehicle.CityMpg ?? vehicle.cityMpg ?? 0,
+      highwayMpg: vehicle.HighwayMpg ?? vehicle.highwayMpg ?? 0,
+      topSpeed: vehicle.TopSpeed ?? vehicle.topSpeed ?? '',
+      acceleration: vehicle.Acceleration ?? vehicle.acceleration ?? '',
+      exteriorColor: vehicle.ExteriorColor ?? vehicle.exteriorColor ?? '',
+      interiorColor: vehicle.InteriorColor ?? vehicle.interiorColor ?? '',
+      featured: vehicle.Featured ?? vehicle.featured ?? true,
+      active: vehicle.Active ?? vehicle.active ?? true,
+      sortOrder: vehicle.SortOrder ?? vehicle.sortOrder ?? 0
+    };
+  }
+
+  private toVehicleRequest(vehicle: Vehicle, token: string): Record<string, string | number | boolean> {
+    return {
+      token,
+      id: vehicle.id,
+      name: vehicle.name,
+      year: vehicle.year,
+      km: vehicle.km,
+      price: vehicle.price,
+      image: vehicle.image,
+      galleryImages: vehicle.galleryImages ?? '',
+      videoUrl: vehicle.videoUrl ?? '',
+      badge: vehicle.badge,
+      brand: vehicle.brand ?? '',
+      condition: vehicle.condition ?? '',
+      displayTag: vehicle.displayTag ?? '',
+      listingStatus: vehicle.listingStatus ?? 'Publicado',
+      transmission: vehicle.transmission,
+      fuel: vehicle.fuel,
+      body: vehicle.body ?? '',
+      engine: vehicle.engine ?? '',
+      drive: vehicle.drive ?? '',
+      description: vehicle.description ?? '',
+      technicalDescription: vehicle.technicalDescription ?? '',
+      featuresOptions: vehicle.featuresOptions ?? '',
+      cityMpg: vehicle.cityMpg ?? 0,
+      highwayMpg: vehicle.highwayMpg ?? 0,
+      topSpeed: vehicle.topSpeed ?? '',
+      acceleration: vehicle.acceleration ?? '',
+      exteriorColor: vehicle.exteriorColor ?? '',
+      interiorColor: vehicle.interiorColor ?? '',
+      featured: vehicle.featured ?? true,
+      active: vehicle.active ?? true,
+      sortOrder: vehicle.sortOrder ?? vehicle.id
+    };
+  }
+
+  uploadVehicleMedia(file: File, token: string): Observable<VelvetOperationResult & { url?: string; Url?: string }> {
+    const formData = new FormData();
+    formData.append('token', token);
+    formData.append('file', file);
+
+    return this.http.post<VelvetOperationResult & { url?: string; Url?: string }>(apiConfig.velvetUploadVehicleMediaUrl, formData);
+  }
+
+  resolveMediaUrl(url: string): string {
+    if (!url) {
+      return '';
+    }
+
+    if (/^https?:\/\//i.test(url) || url.startsWith('/images/')) {
+      return url;
+    }
+
+    if (url.startsWith('/uploads/')) {
+      return `${apiConfig.velvetAssetBaseUrl}${url}`;
+    }
+
+    return url;
+  }
+
+  private resolveGalleryUrls(value: string): string {
+    return (value ?? '')
+      .split('\n')
+      .map((image) => this.resolveMediaUrl(image.trim()))
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  private isOperationFailure(response: ApiVehicle | VelvetOperationResult): boolean {
+    if ('Success' in response || 'success' in response) {
+      return !(response.Success ?? response.success);
+    }
+
+    return false;
+  }
 }

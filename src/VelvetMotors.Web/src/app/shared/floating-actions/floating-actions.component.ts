@@ -1,4 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { SiteContentService } from '../../services/site-content.service';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
@@ -9,4 +10,5 @@ import { ThemeService } from '../../services/theme.service';
 })
 export class FloatingActionsComponent {
   readonly themeService = inject(ThemeService);
+  readonly siteContentService = inject(SiteContentService);
 }

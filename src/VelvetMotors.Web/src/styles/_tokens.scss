@@ -3,8 +3,13 @@
   --bg-secondary: #151210;
   --text-primary: #fff8ef;
   --text-secondary: #bdb3a8;
-  --accent-copper: #b76e3d;
-  --accent-hover: #df9a62;
+  --accent-gold: #ffe378;
+  --accent-copper: #c98725;
+  --accent-bronze: #7a3f12;
+  --accent-hover: #ffd86a;
+  --accent-gradient: linear-gradient(135deg, #ffe986 0%, #d79a34 48%, #7a3f12 100%);
+  --accent-gradient-vertical: linear-gradient(180deg, #ffe986 0%, #d79a34 52%, #7a3f12 100%);
+  --accent-shadow: 0 18px 42px rgba(215, 154, 52, 0.32);
   --border-color: rgba(255, 248, 239, 0.14);
   --shadow-soft: 0 16px 50px rgba(0, 0, 0, 0.28);
   --shadow-strong: 0 28px 90px rgba(0, 0, 0, 0.55);

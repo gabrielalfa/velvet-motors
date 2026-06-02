@@ -25,27 +25,15 @@
 .login-brand {
   align-items: center;
   display: inline-flex;
-  gap: 14px;
   width: max-content;
 }
 
-.login-brand span {
-  align-items: center;
-  background: var(--accent-copper);
-  border-radius: 50%;
-  color: #130d09;
-  display: inline-flex;
-  font-weight: 900;
-  height: 46px;
-  justify-content: center;
-  width: 46px;
-}
-
-.login-brand strong {
-  color: #fff8ef;
-  font-family: var(--font-heading);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.login-brand img {
+  display: block;
+  height: 58px;
+  object-fit: contain;
+  width: auto;
+  max-width: 220px;
 }
 
 .login-copy h1 {
@@ -89,6 +77,22 @@
 
 .login-form .btn {
   margin-top: 8px;
+}
+
+.login-form button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.form-alert {
+  background: rgba(255, 88, 88, 0.12);
+  border: 1px solid rgba(255, 88, 88, 0.32);
+  border-radius: 14px;
+  color: #ffb6a8;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 12px 14px;
 }
 
 @media (max-width: 880px) {

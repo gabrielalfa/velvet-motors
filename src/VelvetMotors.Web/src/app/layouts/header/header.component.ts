@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SiteContentService } from '../../services/site-content.service';
 
 @Component({
   selector: 'app-header',
@@ -11,13 +12,15 @@ import { RouterLink } from '@angular/router';
 })
 export class HeaderComponent {
   private readonly document = inject(DOCUMENT);
+  private readonly siteContentService = inject(SiteContentService);
+  readonly content = this.siteContentService.content;
   readonly isScrolled = signal(false);
   readonly menuOpen = signal(false);
 
   readonly navItems = [
     { label: 'Home', href: '/' },
-    { label: 'Estoque', href: '/frota' },
-    { label: 'Sobre', href: '/#sobre' },
+    { label: 'Veiculos', href: '/veiculos' },
+    { label: 'Avaliação', href: '/vender-seu-carro' },
     { label: 'Diferenciais', href: '/#diferenciais' },
     { label: 'Contato', href: '/#contato' }
   ];

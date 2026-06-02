@@ -1,45 +1,79 @@
-import { CurrencyPipe } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, computed, inject } from '@angular/core';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { CompareService } from '../../services/compare.service';
 import { InventoryService } from '../../services/inventory.service';
 import { Vehicle } from '../../models/vehicle.model';
+import { SiteContentService } from '../../services/site-content.service';
+
+type CompareRow = {
+  label: string;
+  icon: string;
+  value: (vehicle: Vehicle) => string;
+};
 
 @Component({
   selector: 'app-compare-page',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, DecimalPipe, RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './compare-page.component.html',
   styleUrl: './compare-page.component.scss'
 })
-export class ComparePageComponent implements OnDestroy {
+export class ComparePageComponent {
   private readonly inventoryService = inject(InventoryService);
-  private readonly inventoryIntervalId: ReturnType<typeof setInterval>;
+  private readonly siteContentService = inject(SiteContentService);
+  readonly compareService = inject(CompareService);
+  readonly content = this.siteContentService.content;
 
-  readonly vehicles = computed(() => this.inventoryService.vehicles().slice(0, 3));
-  readonly rows = [
-    { label: 'Condition', value: (vehicle: Vehicle) => vehicle.badge || 'Selecionado' },
-    { label: 'Body', value: (vehicle: Vehicle) => vehicle.body || 'Sedan' },
-    { label: 'Make', value: (vehicle: Vehicle) => vehicle.name.split(' ')[0] },
-    { label: 'Model', value: (vehicle: Vehicle) => vehicle.name },
-    { label: 'Fuel type', value: (vehicle: Vehicle) => vehicle.fuel },
-    { label: 'Engine', value: (vehicle: Vehicle) => vehicle.engine || '2.0 Turbo' },
-    { label: 'Year', value: (vehicle: Vehicle) => String(vehicle.year) },
-    { label: 'Transmission', value: (vehicle: Vehicle) => vehicle.transmission },
-    { label: 'Mileage', value: (vehicle: Vehicle) => `${vehicle.km.toLocaleString('pt-BR')} km` },
-    { label: 'Price', value: (vehicle: Vehicle) => `R$ ${vehicle.price.toLocaleString('pt-BR')}` },
-    { label: 'Exterior color', value: (vehicle: Vehicle) => vehicle.exteriorColor || 'Pearl White' },
-    { label: 'Interior color', value: (vehicle: Vehicle) => vehicle.interiorColor || 'Jet Black' }
+  readonly allVehicles = this.inventoryService.vehicles;
+  readonly selectedVehicles = computed(() => {
+    const vehicles = this.allVehicles();
+    return this.compareService.selectedIds()
+      .map((id) => vehicles.find((vehicle) => vehicle.id === id))
+      .filter((vehicle): vehicle is Vehicle => Boolean(vehicle));
+  });
+  readonly slots = computed<Array<Vehicle | null>>(() => {
+    const vehicles = this.selectedVehicles();
+    return [vehicles[0] ?? null, vehicles[1] ?? null, vehicles[2] ?? null];
+  });
+  readonly availableVehicles = computed(() => {
+    const selectedIds = this.compareService.selectedIds();
+    return this.allVehicles().filter((vehicle) => !selectedIds.includes(vehicle.id)).slice(0, 6);
+  });
+
+  readonly rows: CompareRow[] = [
+    { label: 'Condicao', icon: 'lucide:badge-check', value: (vehicle) => vehicle.badge || 'Selecionado' },
+    { label: 'Carroceria', icon: 'lucide:car-front', value: (vehicle) => vehicle.body || 'Sedan' },
+    { label: 'Marca', icon: 'lucide:landmark', value: (vehicle) => vehicle.name.split(' ')[0] },
+    { label: 'Modelo', icon: 'lucide:signature', value: (vehicle) => vehicle.name },
+    { label: 'Combustivel', icon: 'lucide:fuel', value: (vehicle) => vehicle.fuel || '-' },
+    { label: 'Motor', icon: 'lucide:cpu', value: (vehicle) => vehicle.engine || '2.0 Turbo' },
+    { label: 'Ano', icon: 'lucide:calendar-days', value: (vehicle) => String(vehicle.year) },
+    { label: 'Cambio', icon: 'lucide:settings', value: (vehicle) => vehicle.transmission || '-' },
+    { label: 'Quilometragem', icon: 'lucide:gauge', value: (vehicle) => `${vehicle.km.toLocaleString('pt-BR')} km` },
+    { label: 'Valor', icon: 'lucide:badge-dollar-sign', value: (vehicle) => `R$ ${vehicle.price.toLocaleString('pt-BR')}` },
+    { label: 'Cor externa', icon: 'lucide:sparkles', value: (vehicle) => vehicle.exteriorColor || 'Sob consulta' },
+    { label: 'Cor interna', icon: 'lucide:armchair', value: (vehicle) => vehicle.interiorColor || 'Sob consulta' }
   ];
 
   constructor() {
-    this.inventoryService.loadHomeData();
-
-    this.inventoryIntervalId = setInterval(() => {
-      this.inventoryService.loadHomeData();
-    }, 30000);
+    this.inventoryService.loadVehicles();
   }
 
-  ngOnDestroy(): void {
-    clearInterval(this.inventoryIntervalId);
+  addVehicle(vehicle: Vehicle): void {
+    this.compareService.add(vehicle.id);
+  }
+
+  removeVehicle(vehicle: Vehicle): void {
+    this.compareService.remove(vehicle.id);
+  }
+
+  clearComparison(): void {
+    this.compareService.clear();
+  }
+
+  isDifferent(row: CompareRow): boolean {
+    const values = this.selectedVehicles().map((vehicle) => row.value(vehicle));
+    return values.length > 1 && new Set(values).size > 1;
   }
 }

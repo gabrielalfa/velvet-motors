@@ -14,9 +14,14 @@ export const routes: Routes = [
     title: 'Velvet Motors | Veiculos premium em Sao Paulo'
   },
   {
-    path: 'frota',
+    path: 'veiculos',
     component: FleetPageComponent,
-    title: 'Frota | Velvet Motors'
+    title: 'Veiculos | Velvet Motors'
+  },
+  {
+    path: 'frota',
+    redirectTo: 'veiculos',
+    pathMatch: 'full'
   },
   {
     path: 'veiculo/:id',

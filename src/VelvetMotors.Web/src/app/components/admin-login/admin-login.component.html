@@ -1,8 +1,7 @@
 <main class="admin-login">
   <section class="login-card">
     <a class="login-brand" routerLink="/">
-      <span>VM</span>
-      <strong>Velvet Motors</strong>
+      <img src="/images/logo/Aplicação 01.png" alt="Velvet Motors">
     </a>
 
     <div class="login-copy">
@@ -11,19 +10,36 @@
       <p>Ambiente reservado para controlar frota, banners, chamadas da home, comparacoes e configuracoes comerciais do site.</p>
     </div>
 
-    <form class="login-form">
+    <form class="login-form" data-testid="admin-login-form" (ngSubmit)="login()">
       <label>
         E-mail
-        <input type="email" value="admin@velvetmotors.com.br" autocomplete="email">
+        <input
+          data-testid="admin-email"
+          type="email"
+          name="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          autocomplete="email">
       </label>
       <label>
         Senha
-        <input type="password" value="velvetdemo" autocomplete="current-password">
+        <input
+          data-testid="admin-password"
+          type="password"
+          name="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          autocomplete="current-password">
       </label>
-      <a class="btn btn-primary" routerLink="/admin">
+
+      @if (errorMessage()) {
+        <p class="form-alert">{{ errorMessage() }}</p>
+      }
+
+      <button class="btn btn-primary" data-testid="admin-login-submit" type="submit" [disabled]="loading()">
         <iconify-icon icon="lucide:log-in"></iconify-icon>
-        Entrar no painel
-      </a>
+        {{ loading() ? 'Entrando...' : 'Entrar no painel' }}
+      </button>
     </form>
   </section>
 

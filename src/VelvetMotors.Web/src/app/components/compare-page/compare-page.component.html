@@ -1,48 +1,81 @@
 <section class="compare-page">
   <div class="section-shell compare-hero">
-    <span class="eyebrow">Comparacao inteligente</span>
-    <h1>Compare veiculos lado a lado.</h1>
-    <p>Veja atributos importantes em uma tabela limpa e decida com mais seguranca antes de falar com um consultor.</p>
-    <a class="btn btn-secondary" routerLink="/frota">
-      <iconify-icon icon="lucide:plus-circle"></iconify-icon>
-      Adicionar carros da frota
-    </a>
+    <span class="eyebrow">{{ content().compareEyebrow }}</span>
+    <h1>{{ content().compareTitle }}</h1>
+    <p>{{ content().compareDescription }}</p>
+    <div class="compare-hero__actions">
+      <a class="btn btn-secondary" routerLink="/veiculos">
+        <iconify-icon icon="lucide:plus-circle"></iconify-icon>
+        {{ content().compareButtonLabel }}
+      </a>
+      @if (selectedVehicles().length) {
+        <button class="btn btn-ghost" type="button" (click)="clearComparison()">
+          <iconify-icon icon="lucide:trash-2"></iconify-icon>
+          Limpar comparacao
+        </button>
+      }
+    </div>
   </div>
 
   <div class="section-shell compare-grid">
     <aside class="compare-title">
-      <h2>Compare<br>Vehicles</h2>
+      <h2>Compare<br>veiculos</h2>
       <span></span>
+      <p>{{ selectedVehicles().length }}/3 selecionados</p>
     </aside>
 
     <div class="compare-columns">
-      @for (vehicle of vehicles(); track vehicle.id) {
-        <article class="compare-car">
-          <img [src]="vehicle.image" [alt]="vehicle.name">
-          <h3>{{ vehicle.name }}</h3>
-          <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
-        </article>
-      }
-      @for (slot of [1, 2, 3].slice(vehicles().length); track slot) {
-        <article class="compare-car compare-car--empty">
-          <iconify-icon icon="lucide:car-front"></iconify-icon>
-          <span>Add car to compare</span>
+      @for (vehicle of slots(); track $index) {
+        <article class="compare-car" [class.compare-car--empty]="!vehicle">
+          @if (vehicle) {
+            <button type="button" aria-label="Remover da comparacao" (click)="removeVehicle(vehicle)">
+              <iconify-icon icon="lucide:x"></iconify-icon>
+            </button>
+            <img [src]="vehicle.image" [alt]="vehicle.name">
+            <h3>{{ vehicle.name }}</h3>
+            <small>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0':'pt-BR' }} km</small>
+            <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+            <a [routerLink]="['/veiculo', vehicle.id]">Ver detalhes</a>
+          } @else {
+            <iconify-icon icon="lucide:car-front"></iconify-icon>
+            <span>Adicionar veiculo</span>
+            <a routerLink="/veiculos">Escolher na vitrine</a>
+          }
         </article>
       }
     </div>
 
     <div class="compare-table">
       @for (row of rows; track row.label) {
-        <div class="compare-row">
-          <span>{{ row.label }}</span>
-          @for (vehicle of vehicles(); track vehicle.id) {
-            <strong>{{ row.value(vehicle) }}</strong>
-          }
-          @for (slot of [1, 2, 3].slice(vehicles().length); track slot) {
-            <strong>-</strong>
+        <div class="compare-row" [class.compare-row--different]="isDifferent(row)">
+          <span>
+            <iconify-icon [icon]="row.icon"></iconify-icon>
+            {{ row.label }}
+          </span>
+          @for (vehicle of slots(); track $index) {
+            <strong>{{ vehicle ? row.value(vehicle) : '-' }}</strong>
           }
         </div>
       }
     </div>
+
+    @if (availableVehicles().length && selectedVehicles().length < 3) {
+      <section class="compare-suggestions">
+        <div>
+          <span class="eyebrow">Adicionar a comparacao</span>
+          <h2>Sugestoes da vitrine</h2>
+        </div>
+        <div class="suggestion-list">
+          @for (vehicle of availableVehicles(); track vehicle.id) {
+            <button type="button" (click)="addVehicle(vehicle)">
+              <img [src]="vehicle.image" [alt]="vehicle.name">
+              <span>{{ vehicle.name }}</span>
+              <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+              <iconify-icon icon="lucide:plus"></iconify-icon>
+            </button>
+          }
+        </div>
+      </section>
+    }
   </div>
 </section>

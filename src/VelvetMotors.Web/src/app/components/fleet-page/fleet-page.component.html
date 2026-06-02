@@ -1,8 +1,8 @@
 <section class="fleet-page">
   <div class="section-shell fleet-page__header">
     <div>
-      <span class="eyebrow">Estoque Velvet</span>
-      <h1>Frota selecionada</h1>
+      <span class="eyebrow">Veiculos Velvet</span>
+      <h1>Veiculos selecionados</h1>
       <p>Filtre por marca, ano, faixa de preco e encontre o carro certo para sua proxima fase.</p>
     </div>
     <button class="filter-trigger" type="button" (click)="filtersOpen.set(true)">
@@ -12,15 +12,15 @@
   </div>
 
   <div class="section-shell fleet-shortcuts">
-    <a href="/api/velvet/Home" target="_blank" rel="noopener">
-      <strong>VIN-CHECK</strong>
+    <a routerLink="/vender-seu-carro">
+      <strong>Avaliar seu carro</strong>
       <iconify-icon icon="lucide:car-front"></iconify-icon>
     </a>
     <a routerLink="/comparar">
-      <strong>COMPARE</strong>
+      <strong>COMPARAR</strong>
       <span>
         <iconify-icon icon="lucide:scan-search"></iconify-icon>
-        <em>{{ filteredVehicles().length }}</em>
+        <em>{{ compareService.selectedIds().length }}</em>
       </span>
     </a>
   </div>
@@ -46,19 +46,35 @@
     <section class="fleet-results">
       <div class="fleet-results__toolbar">
         <label>
-          <span>Sort by:</span>
+          <span>Ordenar:</span>
           <select [ngModel]="sortBy()" (ngModelChange)="setSortBy($event)">
-            <option value="newest">Date: newest first</option>
-            <option value="price-low">Price: lowest first</option>
-            <option value="price-high">Price: highest first</option>
-            <option value="mileage-low">Mileage: lowest first</option>
+            <option value="newest">Mais recentes</option>
+            <option value="price-low">Menor preco</option>
+            <option value="price-high">Maior preco</option>
+            <option value="mileage-low">Menor km</option>
           </select>
         </label>
-        <div>
-          <iconify-icon icon="lucide:layout-grid"></iconify-icon>
-          <iconify-icon icon="lucide:list"></iconify-icon>
+        <div class="view-toggle" aria-label="Alternar visualizacao">
+          <button
+            type="button"
+            aria-label="Visualizar em cards"
+            [class.is-active]="viewMode() === 'grid'"
+            (click)="setViewMode('grid')">
+            <iconify-icon icon="lucide:layout-grid"></iconify-icon>
+          </button>
+          <button
+            type="button"
+            aria-label="Visualizar em lista"
+            [class.is-active]="viewMode() === 'list'"
+            (click)="setViewMode('list')">
+            <iconify-icon icon="lucide:list"></iconify-icon>
+          </button>
         </div>
       </div>
+
+      @if (compareFeedback()) {
+        <p class="compare-feedback">{{ compareFeedback() }}</p>
+      }
 
       @if (loading()) {
         <div class="fleet-card fleet-card--loading"></div>
@@ -66,22 +82,23 @@
         <div class="empty-state">
           <iconify-icon icon="lucide:search-x"></iconify-icon>
           <h2>Nenhum veiculo encontrado</h2>
-          <p>Ajuste os filtros ou confira se a API retornou carros para a frota.</p>
+          <p>Ajuste os filtros ou confira se a API retornou veiculos para a selecao.</p>
         </div>
       } @else {
-        <div class="fleet-list">
-          @for (vehicle of filteredVehicles(); track vehicleTrackBy($index, vehicle)) {
-            <article class="fleet-card">
+        <div class="fleet-list" [class.fleet-list--grid]="viewMode() === 'grid'">
+          @for (vehicle of visibleVehicles(); track vehicleTrackBy($index, vehicle)) {
+            <article class="fleet-card" [routerLink]="['/veiculo', vehicle.id]" role="link" tabindex="0">
               <div class="fleet-card__image">
                 <img [src]="vehicle.image" [alt]="vehicle.name" loading="lazy">
-                <span class="fleet-card__ribbon">Special</span>
-                <span class="fleet-card__video"><iconify-icon icon="lucide:film"></iconify-icon>Video</span>
+                @if (vehicle.displayTag) {
+                  <span class="fleet-card__ribbon">{{ vehicle.displayTag }}</span>
+                }
               </div>
               <div class="fleet-card__name">
                 <h2>{{ vehicle.name }}</h2>
               </div>
               <div class="fleet-card__price">
-                <small>Buy for</small>
+                <small>Valor</small>
                 <strong>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
                 <a class="btn btn-primary" [routerLink]="['/veiculo', vehicle.id]">
                   <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
@@ -90,22 +107,42 @@
               </div>
               <div class="fleet-card__specs">
                 <div class="spec-grid">
-                  <span><iconify-icon icon="lucide:gauge"></iconify-icon><small>Mileage</small><em>{{ vehicle.km | number:'1.0-0' }}</em></span>
-                  <span><iconify-icon icon="lucide:fuel"></iconify-icon><small>Fuel type</small><em>{{ vehicle.fuel }}</em></span>
-                  <span><iconify-icon icon="lucide:calendar-days"></iconify-icon><small>Year</small><em>{{ vehicle.year }}</em></span>
-                  <span><iconify-icon icon="lucide:settings"></iconify-icon><small>Transmission</small><em>{{ vehicle.transmission }}</em></span>
-                  <span><iconify-icon icon="lucide:route"></iconify-icon><small>Body</small><em>{{ resolveBody(vehicle) }}</em></span>
+                  <span><iconify-icon icon="lucide:gauge"></iconify-icon><em>{{ vehicle.km | number:'1.0-0' }} km</em></span>
+                  <span><iconify-icon icon="lucide:fuel"></iconify-icon><em>{{ vehicle.fuel }}</em></span>
+                  <span><iconify-icon icon="lucide:calendar-days"></iconify-icon><em>{{ vehicle.year }}</em></span>
+                  <span><iconify-icon icon="lucide:settings"></iconify-icon><em>{{ vehicle.transmission }}</em></span>
                 </div>
               </div>
               <div class="fleet-card__meta">
                 <div class="fleet-card__actions">
-                  <span>Stock #VM{{ vehicle.id + 153090 }}</span>
-                  <button type="button"><iconify-icon icon="lucide:git-compare"></iconify-icon>Add to compare</button>
-                  <button type="button"><iconify-icon icon="lucide:share-2"></iconify-icon>Share this</button>
-                  <strong>Certified</strong>
+                  <span>Codigo #VM{{ vehicle.id + 153090 }}</span>
+                  <button
+                    type="button"
+                    [class.is-selected]="compareService.isSelected(vehicle.id)"
+                    [disabled]="!compareService.canAdd(vehicle.id)"
+                    (click)="toggleCompare(vehicle, $event)">
+                    <iconify-icon icon="lucide:git-compare"></iconify-icon>
+                    {{ compareService.isSelected(vehicle.id) ? 'Selecionado' : 'Comparar' }}
+                  </button>
+                  <button type="button"><iconify-icon icon="lucide:share-2"></iconify-icon>Compartilhar</button>
+                  <strong>Certificado Velvet</strong>
                 </div>
+                <a class="fleet-card__details" [routerLink]="['/veiculo', vehicle.id]">
+                  <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
+                  Ver detalhes
+                </a>
               </div>
             </article>
+          }
+        </div>
+
+        <div class="fleet-load-more">
+          <span>{{ visibleVehicles().length }} de {{ filteredVehicles().length }} veiculos exibidos</span>
+          @if (hasMoreVehicles()) {
+            <button type="button" (click)="loadMoreVehicles()">
+              <iconify-icon icon="lucide:plus"></iconify-icon>
+              Ver mais carros
+            </button>
           }
         </div>
       }
@@ -130,7 +167,7 @@
   <label>
     <span>Condicao</span>
     <select [ngModel]="condition()" (ngModelChange)="setCondition($event)">
-      @for (item of conditions; track item) {
+      @for (item of conditions(); track item) {
         <option [value]="item">{{ item }}</option>
       }
     </select>
@@ -140,6 +177,15 @@
     <span>Carroceria</span>
     <select [ngModel]="body()" (ngModelChange)="setBody($event)">
       @for (item of bodies; track item) {
+        <option [value]="item">{{ item }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    <span>Combustivel</span>
+    <select [ngModel]="fuel()" (ngModelChange)="setFuel($event)">
+      @for (item of fuels(); track item) {
         <option [value]="item">{{ item }}</option>
       }
     </select>
@@ -165,12 +211,12 @@
 
   <label>
     <span>Quilometragem maxima: {{ maxMileage() | number:'1.0-0' }} km</span>
-    <input type="range" min="0" max="120000" step="5000" [ngModel]="maxMileage()" (ngModelChange)="setMaxMileage($event)">
+    <input type="range" min="0" max="200000" step="5000" [ngModel]="maxMileage()" (ngModelChange)="setMaxMileage($event)">
   </label>
 
   <label>
     <span>Preco maximo: {{ maxPrice() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
-    <input type="range" min="80000" max="200000" step="5000" [ngModel]="maxPrice()" (ngModelChange)="setMaxPrice($event)">
+    <input type="range" min="80000" max="700000" step="5000" [ngModel]="maxPrice()" (ngModelChange)="setMaxPrice($event)">
   </label>
 
   <label>
@@ -191,5 +237,5 @@
     </select>
   </label>
 
-  <button class="filters__reset" type="button" (click)="resetFilters()">Reset all</button>
+  <button class="filters__reset" type="button" (click)="resetFilters()">Limpar filtros</button>
 </ng-template>

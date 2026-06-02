@@ -9,7 +9,10 @@
       <div class="detail-actions">
         <span>Stock #VM{{ car.id + 15090 }}</span>
         <a href="#contato"><iconify-icon icon="lucide:calendar-check"></iconify-icon>Agendar test drive</a>
-        <a href="#comparar"><iconify-icon icon="lucide:git-compare"></iconify-icon>Comparar</a>
+        <button type="button" (click)="compareVehicle(car)">
+          <iconify-icon icon="lucide:git-compare"></iconify-icon>
+          {{ compareService.isSelected(car.id) ? 'Ver comparacao' : 'Comparar' }}
+        </button>
         <a href="#share"><iconify-icon icon="lucide:share-2"></iconify-icon>Compartilhar</a>
       </div>
     </div>
@@ -18,47 +21,63 @@
       <main>
         <div class="gallery-main">
           <img [src]="car.image" [alt]="car.name">
-          <span class="ribbon">Special</span>
-          <span class="video-badge"><iconify-icon icon="lucide:video"></iconify-icon>1 video</span>
+          @if (car.displayTag) {
+            <span class="ribbon">{{ car.displayTag }}</span>
+          }
         </div>
 
         <div class="thumb-row">
           @for (image of gallery(); track image) {
             <img [src]="image" [alt]="car.name">
+          } @empty {
+            <div class="empty-inline">Nenhuma foto adicional cadastrada.</div>
           }
         </div>
 
         <section class="content-section">
           <h2>Vehicle overview</h2>
-          <p>
-            Uma unidade selecionada para quem busca presenca, conforto e procedencia. A curadoria Velvet prioriza historico,
-            estado geral, combinacao de cor e pacote de equipamentos para entregar uma experiencia de compra acima do comum.
-          </p>
-          <blockquote>
-            A compra de um carro premium começa na emocao, mas precisa terminar com confianca.
-          </blockquote>
-          <p>
-            O veiculo passa por checagem documental e avaliacao visual, com atendimento consultivo para test drive,
-            financiamento e proposta personalizada.
-          </p>
+          @if (car.description) {
+            <p>{{ car.description }}</p>
+          } @else {
+            <div class="empty-box">Descricao ainda nao cadastrada para este veiculo.</div>
+          }
         </section>
+
+        @if (car.videoUrl) {
+          <section class="content-section video-section">
+            <div>
+              <span class="eyebrow">Video</span>
+              <h2>Veja este veiculo em movimento</h2>
+              <p>Abra o video cadastrado para conferir detalhes visuais antes do contato com o consultor.</p>
+            </div>
+            <a class="btn btn-primary" [href]="car.videoUrl" target="_blank" rel="noopener">
+              <iconify-icon icon="lucide:play"></iconify-icon>
+              Assistir video
+            </a>
+          </section>
+        }
 
         <section class="content-section">
           <h2>Technical</h2>
+          @if (car.technicalDescription) {
+            <p>{{ car.technicalDescription }}</p>
+          } @else {
+            <div class="empty-box">Descricao tecnica ainda nao cadastrada.</div>
+          }
           <div class="technical-grid">
             <div>
               <h3><iconify-icon icon="lucide:engine"></iconify-icon>Engine</h3>
               <dl>
-                <div><dt>Layout</dt><dd>{{ car.engine || '2.0 Turbo' }}</dd></div>
+                <div><dt>Layout</dt><dd>{{ car.engine || '-' }}</dd></div>
                 <div><dt>Fuel type</dt><dd>{{ car.fuel }}</dd></div>
-                <div><dt>Drive</dt><dd>{{ car.drive || 'FWD' }}</dd></div>
+                <div><dt>Drive</dt><dd>{{ car.drive || '-' }}</dd></div>
               </dl>
             </div>
             <div>
               <h3><iconify-icon icon="lucide:gauge"></iconify-icon>Performance</h3>
               <dl>
-                <div><dt>Top speed</dt><dd>220 km/h</dd></div>
-                <div><dt>0 - 100 km/h</dt><dd>7.3 s</dd></div>
+                <div><dt>Top speed</dt><dd>{{ car.topSpeed || '-' }}</dd></div>
+                <div><dt>0 - 100 km/h</dt><dd>{{ car.acceleration || '-' }}</dd></div>
                 <div><dt>Transmission</dt><dd>{{ car.transmission }}</dd></div>
               </dl>
             </div>
@@ -67,15 +86,19 @@
 
         <section class="content-section">
           <h2>Features & Options</h2>
-          <div class="features-grid">
-            @for (group of featureGroups; track $index) {
-              <ul>
-                @for (feature of group; track feature) {
-                  <li><iconify-icon icon="lucide:check"></iconify-icon>{{ feature }}</li>
-                }
-              </ul>
-            }
-          </div>
+          @if (features().length) {
+            <div class="features-grid">
+              @for (group of featureGroups(); track $index) {
+                <ul>
+                  @for (feature of group; track feature) {
+                    <li><iconify-icon icon="lucide:check"></iconify-icon>{{ feature }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          } @else {
+            <div class="empty-box">Nenhum item de feature cadastrado.</div>
+          }
         </section>
 
         <section class="content-section" id="contato">
@@ -122,9 +145,9 @@
         </a>
 
         <div class="spec-panel">
-          <div><span>Condition</span><strong>Selecionado</strong></div>
+          <div><span>Condition</span><strong>{{ car.condition || car.badge || '-' }}</strong></div>
           <div><span>Body</span><strong>{{ car.body || 'Sedan' }}</strong></div>
-          <div><span>Make</span><strong>{{ car.name.split(' ')[0] }}</strong></div>
+          <div><span>Make</span><strong>{{ car.brand || car.name.split(' ')[0] }}</strong></div>
           <div><span>Fuel type</span><strong>{{ car.fuel }}</strong></div>
           <div><span>Year</span><strong>{{ car.year }}</strong></div>
           <div><span>Transmission</span><strong>{{ car.transmission }}</strong></div>
@@ -134,9 +157,9 @@
         </div>
 
         <div class="mpg-card">
-          <span><strong>18</strong>City MPG</span>
+          <span><strong>{{ car.cityMpg || '-' }}</strong>City MPG</span>
           <iconify-icon icon="lucide:fuel"></iconify-icon>
-          <span><strong>26</strong>Hwy MPG</span>
+          <span><strong>{{ car.highwayMpg || '-' }}</strong>Hwy MPG</span>
         </div>
       </aside>
     </div>

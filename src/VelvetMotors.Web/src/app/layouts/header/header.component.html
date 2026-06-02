@@ -1,7 +1,6 @@
 <header class="site-header" [class.site-header--scrolled]="isScrolled()">
   <a class="brand" routerLink="/" aria-label="Velvet Motors">
-    <span class="brand__mark">VM</span>
-    <span class="brand__text">Velvet Motors</span>
+    <img class="brand__logo" src="/images/logo/Aplicação 01.png" [alt]="content().brandName">
   </a>
 
   <nav class="desktop-nav" aria-label="Navegacao principal">
@@ -14,7 +13,7 @@
 
   <a class="header-cta" href="/#contato">
     <iconify-icon icon="lucide:calendar-check"></iconify-icon>
-    Agendar visita
+    {{ content().headerCtaLabel }}
   </a>
 
   <button class="menu-toggle" type="button" aria-label="Abrir menu" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
@@ -28,6 +27,6 @@
     @for (item of navItems; track item.label) {
       <a [href]="item.href" (click)="closeMenu()">{{ item.label }}</a>
     }
-    <a class="btn btn-primary" href="#contato" (click)="closeMenu()">Falar com consultor</a>
+    <a class="btn btn-primary" href="#contato" (click)="closeMenu()">{{ content().mobileCtaLabel }}</a>
   </div>
 </div>

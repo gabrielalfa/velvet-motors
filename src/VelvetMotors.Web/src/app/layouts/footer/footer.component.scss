@@ -11,13 +11,15 @@
 }
 
 .footer__brand {
-  color: var(--text-primary);
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
   margin-bottom: 16px;
-  text-transform: uppercase;
+}
+
+.footer__brand img {
+  display: block;
+  height: 58px;
+  object-fit: contain;
+  width: auto;
+  max-width: 220px;
 }
 
 p,

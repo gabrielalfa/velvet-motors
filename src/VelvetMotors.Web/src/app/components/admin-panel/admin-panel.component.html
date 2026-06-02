@@ -1,13 +1,13 @@
 <main class="admin-shell">
   <aside class="admin-sidebar">
     <a class="admin-brand" routerLink="/">
-      <span>VM</span>
-      <strong>Velvet Admin</strong>
+      <img src="/images/logo/Aplicação 01.png" alt="Velvet Motors">
+      <strong>Admin</strong>
     </a>
 
     <nav class="admin-menu" aria-label="Menu administrativo">
       @for (item of menu; track item.id) {
-        <button type="button" [class.active]="activeView() === item.id" (click)="selectView(item.id)">
+        <button type="button" [attr.data-testid]="'admin-menu-' + item.id" [class.active]="activeView() === item.id" (click)="selectView(item.id)">
           <iconify-icon [icon]="item.icon"></iconify-icon>
           {{ item.label }}
         </button>
@@ -15,10 +15,12 @@
     </nav>
 
     <div class="admin-user">
-      <span>GA</span>
+      <span>
+        <img src="/images/logo/favico.png" alt="">
+      </span>
       <div>
-        <strong>Gestor Velvet</strong>
-        <small>Preview para aprovacao</small>
+        <strong>{{ authService.adminName() }}</strong>
+        <small>{{ authService.adminEmail() || 'Sessao administrativa' }}</small>
       </div>
     </div>
   </aside>
@@ -34,12 +36,26 @@
           <iconify-icon icon="lucide:external-link"></iconify-icon>
           Ver site
         </a>
-        <button class="primary-action" type="button">
+        <button class="primary-action" type="button" (click)="newVehicle()">
           <iconify-icon icon="lucide:plus"></iconify-icon>
-          Novo item
+          Novo veiculo
+        </button>
+        <button class="ghost-action" type="button" (click)="logout()">
+          <iconify-icon icon="lucide:log-out"></iconify-icon>
+          Sair
         </button>
       </div>
     </header>
+
+    @if (feedback()) {
+      <div class="admin-feedback" role="status">
+        <p>{{ feedback() }}</p>
+        <button type="button" aria-label="Fechar mensagem" (click)="clearFeedback()">
+          <span></span>
+          <iconify-icon icon="lucide:x"></iconify-icon>
+        </button>
+      </div>
+    }
 
     @if (activeView() === 'dashboard') {
       <section class="metric-grid">
@@ -51,12 +67,12 @@
         <article>
           <span>Valor em vitrine</span>
           <strong>{{ inventoryValue() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
-          <small>Frota premium curada</small>
+          <small>Selecao premium curada</small>
         </article>
         <article>
           <span>Leads abertos</span>
-          <strong>18</strong>
-          <small>7 via WhatsApp</small>
+          <strong>{{ activeEvaluations() }}</strong>
+          <small>{{ totalEvaluations() }} avaliações recebidas</small>
         </article>
         <article>
           <span>Banners ativos</span>
@@ -94,10 +110,135 @@
           </div>
           <div class="quick-actions">
             <button type="button" (click)="selectView('fleet')">Cadastrar veiculo</button>
+            <button type="button" (click)="editContent()">Editar textos e CTAs</button>
             <button type="button" (click)="selectView('showcase')">Editar banner inicial</button>
-            <button type="button" (click)="selectView('leads')">Ver propostas</button>
+            <button type="button" (click)="selectView('leads')">Ver avaliações</button>
           </div>
         </article>
+      </section>
+    }
+
+    @if (activeView() === 'content') {
+      <section class="panel-card content-manager">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Editor do site</span>
+            <h2>Textos, CTAs e canais comerciais</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-action" type="button" (click)="resetContent()" [disabled]="saving()">
+              <iconify-icon icon="lucide:rotate-ccw"></iconify-icon>
+              Restaurar padrao
+            </button>
+            <button class="primary-action" type="button" (click)="saveContent()" [disabled]="saving()">
+              <iconify-icon icon="lucide:save"></iconify-icon>
+              {{ saving() ? 'Salvando...' : 'Salvar conteudo' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="content-preview">
+          <div>
+            <span>{{ editingContent.heroEyebrow }}</span>
+            <strong>{{ editingContent.heroTitle }}</strong>
+            <p>{{ editingContent.heroDescription }}</p>
+          </div>
+          <a class="primary-action" [href]="siteContentService.whatsappUrl()" target="_blank" rel="noopener">
+            <iconify-icon icon="logos:whatsapp-icon"></iconify-icon>
+            Testar WhatsApp
+          </a>
+        </div>
+
+        <form class="admin-editor content-editor" (ngSubmit)="saveContent()">
+          <article class="editor-section">
+            <div>
+              <span class="eyebrow">Identidade</span>
+              <h3>Marca e menu</h3>
+            </div>
+            <div class="form-grid">
+              <label>Nome da loja <input name="brandName" [(ngModel)]="editingContent.brandName"></label>
+              <label>CTA do topo <input name="headerCtaLabel" [(ngModel)]="editingContent.headerCtaLabel"></label>
+              <label>CTA menu mobile <input name="mobileCtaLabel" [(ngModel)]="editingContent.mobileCtaLabel"></label>
+            </div>
+          </article>
+
+          <article class="editor-section">
+            <div>
+              <span class="eyebrow">Home hero</span>
+              <h3>Primeira dobra</h3>
+            </div>
+            <div class="form-grid">
+              <label>Texto superior <input name="heroEyebrow" [(ngModel)]="editingContent.heroEyebrow"></label>
+              <label>Titulo principal <input name="heroTitle" [(ngModel)]="editingContent.heroTitle"></label>
+              <label class="span-2">Descricao <textarea name="heroDescription" [(ngModel)]="editingContent.heroDescription"></textarea></label>
+              <label>Botao principal <input name="heroPrimaryLabel" [(ngModel)]="editingContent.heroPrimaryLabel"></label>
+              <label>Botao secundario <input name="heroSecondaryLabel" [(ngModel)]="editingContent.heroSecondaryLabel"></label>
+            </div>
+          </article>
+
+          <article class="editor-section">
+            <div>
+              <span class="eyebrow">Busca rapida</span>
+              <h3>Labels do filtro inicial</h3>
+            </div>
+            <div class="form-grid">
+              <label>Marca <input name="searchBrandLabel" [(ngModel)]="editingContent.searchBrandLabel"></label>
+              <label>Modelo <input name="searchModelLabel" [(ngModel)]="editingContent.searchModelLabel"></label>
+              <label>Placeholder modelo <input name="searchModelPlaceholder" [(ngModel)]="editingContent.searchModelPlaceholder"></label>
+              <label>Ano <input name="searchYearLabel" [(ngModel)]="editingContent.searchYearLabel"></label>
+              <label>Condicao <input name="searchPriceLabel" [(ngModel)]="editingContent.searchPriceLabel"></label>
+              <label>Botao <input name="searchButtonLabel" [(ngModel)]="editingContent.searchButtonLabel"></label>
+            </div>
+          </article>
+
+          <article class="editor-section">
+            <div>
+              <span class="eyebrow">Secoes comerciais</span>
+              <h3>Comparacao, destaques e venda</h3>
+            </div>
+            <div class="form-grid">
+              <label>Eyebrow comparacao <input name="compareEyebrow" [(ngModel)]="editingContent.compareEyebrow"></label>
+              <label>Titulo comparacao <input name="compareTitle" [(ngModel)]="editingContent.compareTitle"></label>
+              <label class="span-2">Descricao comparacao <textarea name="compareDescription" [(ngModel)]="editingContent.compareDescription"></textarea></label>
+              <label>Botao comparacao <input name="compareButtonLabel" [(ngModel)]="editingContent.compareButtonLabel"></label>
+              <label>Eyebrow frota <input name="fleetEyebrow" [(ngModel)]="editingContent.fleetEyebrow"></label>
+              <label>Titulo frota <input name="fleetTitle" [(ngModel)]="editingContent.fleetTitle"></label>
+              <label>CTA frota <input name="fleetCtaLabel" [(ngModel)]="editingContent.fleetCtaLabel"></label>
+              <label>Eyebrow venda <input name="sellEyebrow" [(ngModel)]="editingContent.sellEyebrow"></label>
+              <label>Titulo venda <input name="sellTitle" [(ngModel)]="editingContent.sellTitle"></label>
+              <label class="span-2">Descricao venda <textarea name="sellDescription" [(ngModel)]="editingContent.sellDescription"></textarea></label>
+              <label>Botao venda <input name="sellButtonLabel" [(ngModel)]="editingContent.sellButtonLabel"></label>
+              <label>Eyebrow diferenciais <input name="differencesEyebrow" [(ngModel)]="editingContent.differencesEyebrow"></label>
+              <label>Titulo diferenciais <input name="differencesTitle" [(ngModel)]="editingContent.differencesTitle"></label>
+            </div>
+          </article>
+
+          <article class="editor-section">
+            <div>
+              <span class="eyebrow">Contato</span>
+              <h3>WhatsApp, rodape e redes</h3>
+            </div>
+            <div class="form-grid">
+              <label class="span-2">Descricao do rodape <textarea name="footerDescription" [(ngModel)]="editingContent.footerDescription"></textarea></label>
+              <label>Endereco <input name="address" [(ngModel)]="editingContent.address"></label>
+              <label>Telefone exibido <input name="phone" [(ngModel)]="editingContent.phone"></label>
+              <label>Horario <input name="hours" [(ngModel)]="editingContent.hours"></label>
+              <label>WhatsApp com DDI <input name="whatsappNumber" [(ngModel)]="editingContent.whatsappNumber"></label>
+              <label class="span-2">Mensagem inicial do WhatsApp <textarea name="whatsappMessage" [(ngModel)]="editingContent.whatsappMessage"></textarea></label>
+              <label>Instagram <input name="instagramUrl" [(ngModel)]="editingContent.instagramUrl"></label>
+              <label>LinkedIn <input name="linkedinUrl" [(ngModel)]="editingContent.linkedinUrl"></label>
+              <label>YouTube <input name="youtubeUrl" [(ngModel)]="editingContent.youtubeUrl"></label>
+            </div>
+          </article>
+
+          <div class="editor-actions">
+            <button class="ghost-action" type="button" (click)="resetContent()" [disabled]="saving()">Restaurar padrao</button>
+            <button class="primary-action" type="submit" [disabled]="saving()">
+              <iconify-icon icon="lucide:save"></iconify-icon>
+              {{ saving() ? 'Salvando...' : 'Salvar conteudo do site' }}
+            </button>
+          </div>
+        </form>
       </section>
     }
 
@@ -105,100 +246,571 @@
       <section class="panel-card">
         <div class="panel-heading">
           <div>
-            <span class="eyebrow">Gestao de frota</span>
+            <span class="eyebrow">Gestao de veiculos</span>
             <h2>Veiculos publicados</h2>
           </div>
-          <button class="primary-action" type="button">Adicionar veiculo</button>
+          <div class="topbar-actions">
+            <button class="ghost-action" type="button" (click)="openHighlights()">
+              <iconify-icon icon="lucide:star"></iconify-icon>
+              Destaques
+            </button>
+            <button class="primary-action" data-testid="add-vehicle-button" type="button" (click)="newVehicle()">Adicionar veiculo</button>
+          </div>
         </div>
 
-        <div class="admin-table">
-          @for (vehicle of vehicles().slice(0, 8); track vehicle.id) {
-            <article>
-              <img [src]="vehicle.image" [alt]="vehicle.name">
+        @if (vehicleEditorOpen()) {
+          <form class="admin-editor vehicle-wizard" data-testid="vehicle-editor" (ngSubmit)="saveVehicle()">
+            <div class="panel-heading compact-heading">
               <div>
-                <strong>{{ vehicle.name }}</strong>
-                <small>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0':'pt-BR' }} km - {{ vehicle.transmission }}</small>
+                <span class="eyebrow">{{ editingVehicle.id ? 'Editar veiculo' : 'Novo veiculo' }}</span>
+                <h2 data-testid="vehicle-editor-title">{{ editingVehicle.name || 'Cadastro de veiculo' }}</h2>
               </div>
-              <span>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
-              <button type="button">Editar</button>
-            </article>
-          }
+              <button class="ghost-action" data-testid="close-vehicle-editor" type="button" (click)="closeVehicleEditor()">Fechar formulario</button>
+            </div>
+
+            <nav class="wizard-steps" aria-label="Etapas do veiculo">
+              @for (step of vehicleEditorSteps; track step.id) {
+                <button type="button" [class.active]="vehicleEditorStep() === step.id" (click)="setVehicleEditorStep(step.id)">
+                  <iconify-icon [icon]="step.icon"></iconify-icon>
+                  {{ step.label }}
+                </button>
+              }
+            </nav>
+
+            <div class="wizard-layout">
+              <aside class="wizard-preview">
+                <div class="wizard-preview__image">
+                  @if (editingVehicle.image) {
+                    <img [src]="editingVehicle.image" [alt]="editingVehicle.name || 'Preview do veiculo'">
+                  } @else {
+                    <iconify-icon icon="lucide:image-off"></iconify-icon>
+                  }
+                </div>
+                <strong>{{ editingVehicle.name || 'Veiculo sem nome' }}</strong>
+                <span>{{ editingVehicle.year }} - {{ editingVehicle.km | number:'1.0-0':'pt-BR' }} km</span>
+                <small>{{ editingVehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</small>
+              </aside>
+
+              <section class="wizard-panel">
+                @if (vehicleEditorStep() === 'general') {
+                  <div class="form-grid">
+                    <label>Nome do veiculo <input data-testid="vehicle-name-input" name="vehicleName" [(ngModel)]="editingVehicle.name"></label>
+                    <label>Marca <input data-testid="vehicle-brand-input" name="vehicleBrand" [(ngModel)]="editingVehicle.brand" placeholder="BMW, Audi, Mercedes"></label>
+                    <label>Ano <input data-testid="vehicle-year-input" name="vehicleYear" type="number" [(ngModel)]="editingVehicle.year"></label>
+                    <label>Valor <input data-testid="vehicle-price-input" name="vehiclePrice" type="number" [(ngModel)]="editingVehicle.price"></label>
+                    <label>Km <input data-testid="vehicle-km-input" name="vehicleKm" type="number" [(ngModel)]="editingVehicle.km"></label>
+                    <label>Status
+                      <select data-testid="vehicle-status-select" name="vehicleStatus" [(ngModel)]="editingVehicle.listingStatus">
+                        <option value="Publicado">Publicado</option>
+                        <option value="Rascunho">Nao publicado</option>
+                        <option value="Reservado">Reservado</option>
+                        <option value="Vendido">Vendido</option>
+                      </select>
+                    </label>
+                    <label>Condicao <input data-testid="vehicle-condition-input" name="vehicleCondition" [(ngModel)]="editingVehicle.condition" placeholder="Selecionado, Unico dono..."></label>
+                    <label>Tag do card
+                      <select name="vehicleDisplayTag" [(ngModel)]="editingVehicle.displayTag">
+                        <option value="">Sem tag</option>
+                        <option value="Novidade">Novidade</option>
+                        <option value="Exclusivo">Exclusivo</option>
+                        <option value="Baixou valor">Baixou valor</option>
+                      </select>
+                    </label>
+                    <label>Selo interno <input name="vehicleBadge" [(ngModel)]="editingVehicle.badge"></label>
+                    <label>Carroceria <input data-testid="vehicle-body-input" name="vehicleBody" [(ngModel)]="editingVehicle.body"></label>
+                  </div>
+                }
+
+                @if (vehicleEditorStep() === 'media') {
+                  <div class="media-manager">
+                    <div class="media-upload-grid">
+                      <label class="media-dropzone">
+                        <input type="file" accept="image/*" (change)="uploadVehicleMedia($event, 'main')">
+                        <iconify-icon icon="lucide:image-plus"></iconify-icon>
+                        <strong>Substituir foto principal</strong>
+                        <span>Corte horizontal 16:9 aplicado automaticamente.</span>
+                      </label>
+                      <label class="media-dropzone">
+                        <input type="file" accept="image/*" multiple (change)="uploadVehicleMedia($event, 'gallery')">
+                        <iconify-icon icon="lucide:images"></iconify-icon>
+                        <strong>Adicionar galeria</strong>
+                        <span>Selecione varias fotos ao mesmo tempo.</span>
+                      </label>
+                    </div>
+
+                    <label class="video-field">URL do video
+                      <input name="vehicleVideo" [(ngModel)]="editingVehicle.videoUrl" placeholder="https://www.youtube.com/embed/ID_DO_VIDEO">
+                      <small>Use a URL de incorporacao do YouTube: Compartilhar > Incorporar > copie apenas o link do src, como https://www.youtube.com/embed/ID.</small>
+                    </label>
+                  </div>
+                  <div class="media-preview">
+                    @for (image of vehicleImages(editingVehicle); track image) {
+                      <figure [class.is-main]="image === editingVehicle.image">
+                        <img [src]="image" [alt]="editingVehicle.name || 'Foto do veiculo'">
+                        <figcaption>
+                          <span>{{ image === editingVehicle.image ? 'Principal' : 'Galeria' }}</span>
+                          <div>
+                            @if (image !== editingVehicle.image) {
+                              <button type="button" (click)="setMainImage(image)">
+                                <iconify-icon icon="lucide:star"></iconify-icon>
+                                Principal
+                              </button>
+                            }
+                            <button type="button" class="danger-action" (click)="removeVehicleImage(image)">
+                              <iconify-icon icon="lucide:trash-2"></iconify-icon>
+                              Remover
+                            </button>
+                          </div>
+                        </figcaption>
+                      </figure>
+                    } @empty {
+                      <p>Nenhuma imagem cadastrada ainda.</p>
+                    }
+                  </div>
+                }
+
+                @if (vehicleEditorStep() === 'description') {
+                  <div class="form-grid">
+                    <label class="span-2">Vehicle overview <textarea name="vehicleDescription" [(ngModel)]="editingVehicle.description" placeholder="Descreva procedencia, estado geral, pacote, diferenciais e proposta comercial."></textarea></label>
+                    <label class="span-2">Technical na descricao <textarea name="vehicleTechnicalDescription" [(ngModel)]="editingVehicle.technicalDescription" placeholder="Detalhes tecnicos em texto livre, comportamento, conforto, consumo e experiencia ao dirigir."></textarea></label>
+                  </div>
+                }
+
+                @if (vehicleEditorStep() === 'technical') {
+                  <div class="form-grid">
+                    <label>Motor <input name="vehicleEngine" [(ngModel)]="editingVehicle.engine"></label>
+                    <label>Cambio <input name="vehicleTransmission" [(ngModel)]="editingVehicle.transmission"></label>
+                    <label>Combustivel <input name="vehicleFuel" [(ngModel)]="editingVehicle.fuel"></label>
+                    <label>Tracao <input name="vehicleDrive" [(ngModel)]="editingVehicle.drive"></label>
+                    <label>Consumo cidade <input name="vehicleCityMpg" type="number" [(ngModel)]="editingVehicle.cityMpg"></label>
+                    <label>Consumo estrada <input name="vehicleHighwayMpg" type="number" [(ngModel)]="editingVehicle.highwayMpg"></label>
+                    <label>Velocidade maxima <input name="vehicleTopSpeed" [(ngModel)]="editingVehicle.topSpeed"></label>
+                    <label>0 - 100 km/h <input name="vehicleAcceleration" [(ngModel)]="editingVehicle.acceleration"></label>
+                    <label>Cor externa <input name="vehicleExterior" [(ngModel)]="editingVehicle.exteriorColor"></label>
+                    <label>Cor interna <input name="vehicleInterior" [(ngModel)]="editingVehicle.interiorColor"></label>
+                  </div>
+                }
+
+                @if (vehicleEditorStep() === 'features') {
+                  <div class="form-grid">
+                    <label class="span-2">Features & Options <textarea name="vehicleFeatures" [(ngModel)]="editingVehicle.featuresOptions" placeholder="Uma feature por linha. Ex: Bancos em couro"></textarea></label>
+                  </div>
+                }
+              </section>
+            </div>
+
+            <div class="wizard-actions">
+              <button class="ghost-action" type="button" (click)="previousVehicleEditorStep()">Voltar etapa</button>
+              <button class="ghost-action" type="button" (click)="nextVehicleEditorStep()">Proxima etapa</button>
+              <button class="primary-action" data-testid="save-vehicle-button" type="submit" [disabled]="saving()">
+                <iconify-icon icon="lucide:save"></iconify-icon>
+                {{ saving() ? 'Salvando...' : 'Salvar veiculo' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <div class="vehicle-admin-filters">
+            <label>
+              <iconify-icon icon="lucide:search"></iconify-icon>
+              <input data-testid="vehicle-search-input" type="search" placeholder="Buscar por nome, marca, ano..." [ngModel]="vehicleSearch()" (ngModelChange)="setVehicleSearch($event)" [ngModelOptions]="{ standalone: true }">
+            </label>
+
+            <div class="status-filter" aria-label="Filtro rapido por status">
+              @for (status of vehicleStatusFilters; track status) {
+                <button type="button" [attr.data-testid]="'vehicle-status-filter-' + status" [class.is-active]="vehicleStatusFilter() === status" (click)="setVehicleStatusFilter(status)">
+                  {{ status }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="admin-table">
+            @for (vehicle of paginatedVehicles(); track vehicle.id) {
+              <article data-testid="admin-vehicle-row">
+                <img [src]="vehicle.image" [alt]="vehicle.name">
+                <div>
+                  <strong>{{ vehicle.name }}</strong>
+                  <small>{{ vehicle.year }} - {{ vehicle.km | number:'1.0-0':'pt-BR' }} km - {{ vehicle.transmission }}</small>
+                  <small class="status-pill" [class.is-off]="normalizedVehicleStatus(vehicle) !== 'Publicado'">{{ normalizedVehicleStatus(vehicle) }}</small>
+                </div>
+                <span>{{ vehicle.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+                <button class="table-action highlight-action" type="button" [class.is-selected]="vehicle.featured" [attr.aria-label]="vehicle.featured ? 'Remover dos destaques' : 'Adicionar aos destaques'" (click)="toggleHighlight(vehicle)">
+                  <iconify-icon [icon]="vehicle.featured ? 'lucide:star' : 'lucide:star'"></iconify-icon>
+                  {{ vehicle.featured ? 'Destaque' : 'Destacar' }}
+                </button>
+                <button class="table-action" data-testid="edit-vehicle-button" type="button" (click)="editVehicle(vehicle)">
+                  <iconify-icon icon="lucide:pencil"></iconify-icon>
+                  Editar
+                </button>
+                <button class="table-action danger-action" data-testid="delete-vehicle-button" type="button" (click)="deleteVehicle(vehicle)">
+                  <iconify-icon icon="lucide:trash-2"></iconify-icon>
+                  Remover
+                </button>
+              </article>
+            } @empty {
+              <article class="empty-row">
+                <iconify-icon icon="lucide:search-x"></iconify-icon>
+                <div>
+                  <strong>Nenhum veiculo encontrado</strong>
+                  <small>Altere a busca ou escolha outro status.</small>
+                </div>
+              </article>
+            }
+          </div>
+
+          <nav class="admin-pagination" aria-label="Paginacao de veiculos do painel">
+            <span>Mostrando {{ vehicleRangeStart() }}-{{ vehicleRangeEnd() }} de {{ filteredVehicles().length }} veiculos</span>
+
+            <div class="admin-pagination__controls">
+              <button type="button" [disabled]="activeVehiclePage() === 1" (click)="goToVehiclePage(activeVehiclePage() - 1)">
+                <iconify-icon icon="lucide:chevron-left"></iconify-icon>
+                Anterior
+              </button>
+
+              <small>Pagina {{ activeVehiclePage() }} de {{ vehicleTotalPages() }}</small>
+
+              <div class="admin-pagination__pages">
+                @for (page of vehiclePages(); track page) {
+                  <button type="button" [class.is-active]="page === activeVehiclePage()" (click)="goToVehiclePage(page)">
+                    {{ page }}
+                  </button>
+                }
+              </div>
+
+              <button type="button" [disabled]="activeVehiclePage() === vehicleTotalPages()" (click)="goToVehiclePage(activeVehiclePage() + 1)">
+                Proxima
+                <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+              </button>
+            </div>
+          </nav>
+        }
+
+        <div class="highlight-canvas" [class.highlight-canvas--open]="highlightsOpen()">
+          <button class="highlight-canvas__backdrop" type="button" aria-label="Fechar destaques" (click)="closeHighlights()"></button>
+          <aside class="highlight-panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <span class="eyebrow">Home</span>
+                <h2>Destaques da home</h2>
+              </div>
+              <button class="ghost-action" type="button" (click)="closeHighlights()">Fechar</button>
+            </div>
+            <p>Ordene os veiculos marcados com estrela na lista principal. A adicao e remocao de destaques acontece no card do veiculo.</p>
+
+            <div class="highlight-order">
+              <strong>Ordem dos destaques</strong>
+              @for (vehicle of highlightVehicles(); track vehicle.id) {
+                <article>
+                  <span>{{ $index + 1 }}</span>
+                  <p>{{ vehicle.name }}</p>
+                  <button type="button" (click)="moveHighlight(vehicle, -1)">
+                    <iconify-icon icon="lucide:arrow-up"></iconify-icon>
+                  </button>
+                  <button type="button" (click)="moveHighlight(vehicle, 1)">
+                    <iconify-icon icon="lucide:arrow-down"></iconify-icon>
+                  </button>
+                </article>
+              } @empty {
+                <p>Nenhum destaque selecionado.</p>
+              }
+            </div>
+
+            <button class="primary-action" type="button" [disabled]="saving()" (click)="saveHighlights()">
+              <iconify-icon icon="lucide:save"></iconify-icon>
+              Salvar destaques
+            </button>
+          </aside>
         </div>
       </section>
     }
 
     @if (activeView() === 'showcase') {
-      <section class="panel-card">
+      <section class="panel-card showcase-manager">
         <div class="panel-heading">
           <div>
-            <span class="eyebrow">Vitrine Home</span>
-            <h2>Carrossel inicial e destaques</h2>
+            <span class="eyebrow">Carrossel inicial</span>
+            <h2>Imagens do hero inicial</h2>
           </div>
-          <button class="primary-action" type="button">Salvar vitrine</button>
+          <div class="topbar-actions">
+            <a class="ghost-action" routerLink="/">
+              <iconify-icon icon="lucide:external-link"></iconify-icon>
+              Ver home
+            </a>
+            <button class="primary-action" type="button" (click)="newBanner()">
+              <iconify-icon icon="lucide:plus"></iconify-icon>
+              Novo banner
+            </button>
+          </div>
+        </div>
+
+        <div class="showcase-dashboard">
+          <article>
+            <span>Banners ativos</span>
+            <strong>{{ activeBanners().length }}</strong>
+            <small>Usados no hero da home</small>
+          </article>
+          <article>
+            <span>Total cadastrado</span>
+            <strong>{{ banners().length }}</strong>
+            <small>Inclui rascunhos e pausados</small>
+          </article>
+          <article>
+            <span>Fonte do texto</span>
+            <strong>Fixa</strong>
+            <small>Edite em Conteudo do site</small>
+          </article>
+        </div>
+
+        <div class="showcase-editor">
+          <div class="showcase-preview">
+            <img [src]="editingBanner.image" [alt]="editingBanner.title || 'Preview do banner'">
+            <div>
+              <span>{{ siteContent().heroEyebrow }}</span>
+              <strong>{{ siteContent().heroTitle }}</strong>
+              <small>{{ siteContent().heroDescription }}</small>
+            </div>
+          </div>
+
+          <form class="admin-editor showcase-form" (ngSubmit)="saveBanner()">
+            <div class="form-grid">
+              <label>Ordem
+                <input name="bannerSort" type="number" min="1" [(ngModel)]="editingBanner.sortOrder">
+              </label>
+              <label>Status
+                <select name="bannerActive" [(ngModel)]="editingBanner.active">
+                  <option [ngValue]="true">Publicado</option>
+                  <option [ngValue]="false">Pausado</option>
+                </select>
+              </label>
+              <label class="span-2">Imagem do banner
+                <input name="bannerImage" [(ngModel)]="editingBanner.image" placeholder="/images/banner/1.png">
+              </label>
+            </div>
+            <div class="editor-actions">
+              <button class="ghost-action" type="button" (click)="editContent()">
+                <iconify-icon icon="lucide:file-pen-line"></iconify-icon>
+                Editar texto fixo
+              </button>
+              <button class="ghost-action" type="button" (click)="newBanner()">Limpar formulario</button>
+              <button class="primary-action" type="submit" [disabled]="saving()">
+                <iconify-icon icon="lucide:save"></iconify-icon>
+                {{ saving() ? 'Salvando...' : 'Salvar banner no site' }}
+              </button>
+            </div>
+          </form>
         </div>
 
         <div class="showcase-grid">
-          @for (banner of banners(); track banner.id) {
-            <article>
+          @for (banner of sortedBanners(); track banner.id) {
+            <article [class.is-paused]="!(banner.active ?? true)">
               <img [src]="banner.image" [alt]="banner.title">
               <div>
-                <span>Banner {{ banner.id }}</span>
-                <strong>{{ banner.headline }}</strong>
-                <button type="button">Trocar imagem</button>
+                <span>Banner {{ banner.sortOrder || banner.id }} - {{ (banner.active ?? true) ? 'Publicado' : 'Pausado' }}</span>
+                <strong>Imagem do carrossel inicial</strong>
+                <small>{{ banner.image }}</small>
+                <div class="showcase-card-actions">
+                  <button type="button" (click)="editBanner(banner)">
+                    <iconify-icon icon="lucide:pencil"></iconify-icon>
+                    Editar
+                  </button>
+                  <button type="button" (click)="toggleBannerStatus(banner)">
+                    <iconify-icon [icon]="(banner.active ?? true) ? 'lucide:pause' : 'lucide:play'"></iconify-icon>
+                    {{ (banner.active ?? true) ? 'Pausar' : 'Publicar' }}
+                  </button>
+                  <button class="danger-action" type="button" (click)="deleteBanner(banner)">
+                    <iconify-icon icon="lucide:trash-2"></iconify-icon>
+                    Remover
+                  </button>
+                </div>
               </div>
             </article>
-          }
-        </div>
-
-        <div class="featured-admin">
-          @for (vehicle of featuredVehicles(); track vehicle.id) {
-            <button type="button">
-              <img [src]="vehicle.image" [alt]="vehicle.name">
-              <span>{{ vehicle.name }}</span>
-            </button>
+          } @empty {
+            <article class="showcase-empty">
+              <iconify-icon icon="lucide:image-off"></iconify-icon>
+              <div>
+                <span>Nenhum banner</span>
+                <strong>Cadastre o primeiro slide do hero.</strong>
+              </div>
+            </article>
           }
         </div>
       </section>
     }
 
     @if (activeView() === 'compare') {
-      <section class="panel-card">
+      <section class="panel-card compare-admin">
         <div class="panel-heading">
           <div>
             <span class="eyebrow">Pagina de comparacao</span>
-            <h2>Campos exibidos ao cliente</h2>
+            <h2>Campos do comparador do comprador</h2>
           </div>
-          <button class="primary-action" type="button">Atualizar regras</button>
+          <button class="primary-action" type="button" (click)="showFeedback('Regras de comparacao atualizadas para o preview do painel.')">
+            <iconify-icon icon="lucide:save"></iconify-icon>
+            Atualizar regras
+          </button>
         </div>
 
-        <div class="settings-grid">
-          <label><input type="checkbox" checked> Preco</label>
-          <label><input type="checkbox" checked> Quilometragem</label>
-          <label><input type="checkbox" checked> Cambio</label>
-          <label><input type="checkbox" checked> Combustivel</label>
-          <label><input type="checkbox" checked> Caracteristicas premium</label>
-          <label><input type="checkbox"> Historico de manutencao</label>
+        <div class="compare-admin__summary">
+          <article>
+            <span>Campos ativos</span>
+            <strong>{{ compareEnabledFields().length }}</strong>
+            <small>Visiveis na tabela do comprador</small>
+          </article>
+          <article>
+            <span>Slots de veiculos</span>
+            <strong>3</strong>
+            <small>Padrao atual da pagina publica</small>
+          </article>
+          <article>
+            <span>Origem</span>
+            <strong>Frota</strong>
+            <small>Dados reais dos veiculos cadastrados</small>
+          </article>
+        </div>
+
+        <div class="compare-admin__grid">
+          @for (field of compareFields; track field.id) {
+            <button class="compare-field-card" type="button" [class.is-active]="compareFieldEnabled(field.id)" (click)="toggleCompareField(field.id)">
+              <span class="compare-field-card__icon">
+                <iconify-icon [icon]="field.icon"></iconify-icon>
+              </span>
+              <span class="compare-field-card__body">
+                <small>{{ field.group }}</small>
+                <strong>{{ field.label }}</strong>
+                <em>{{ field.sample }}</em>
+              </span>
+              <span class="compare-switch" aria-hidden="true">
+                <i></i>
+              </span>
+            </button>
+          }
+        </div>
+
+        <div class="compare-admin__preview">
+          <div>
+            <span class="eyebrow">Preview publico</span>
+            <h3>Como o comprador entende a comparacao</h3>
+          </div>
+
+          <div class="compare-preview-table">
+            @for (field of compareFields; track field.id) {
+              @if (compareFieldEnabled(field.id)) {
+                <div>
+                  <span>
+                    <iconify-icon [icon]="field.icon"></iconify-icon>
+                    {{ field.label }}
+                  </span>
+                  <strong>{{ field.sample }}</strong>
+                  <strong>{{ field.id === 'price' ? 'R$ 176.900' : field.sample }}</strong>
+                  <strong>{{ field.id === 'year' ? '2024' : field.sample }}</strong>
+                </div>
+              }
+            }
+          </div>
         </div>
       </section>
     }
 
     @if (activeView() === 'leads') {
-      <section class="panel-card">
+      <section class="panel-card evaluation-manager">
         <div class="panel-heading">
           <div>
-            <span class="eyebrow">CRM comercial</span>
-            <h2>Leads e oportunidades</h2>
+            <span class="eyebrow">Avaliações recebidas</span>
+            <h2>Solicitações de avaliação</h2>
           </div>
-          <button class="primary-action" type="button">Exportar</button>
+          <button class="primary-action" type="button" (click)="exportEvaluationsPdf()">
+            <iconify-icon icon="lucide:download"></iconify-icon>
+            Exportar avaliações
+          </button>
         </div>
 
-        <div class="lead-board">
-          @for (lead of leads; track lead.name) {
-            <article>
-              <span>{{ lead.status }}</span>
-              <strong>{{ lead.name }}</strong>
-              <p>{{ lead.interest }}</p>
-              <small>{{ lead.channel }}</small>
+        <div class="evaluation-summary">
+          <article>
+            <span>Total</span>
+            <strong>{{ totalEvaluations() }}</strong>
+            <small>Solicitações capturadas</small>
+          </article>
+          <article>
+            <span>Novas</span>
+            <strong>{{ newEvaluations() }}</strong>
+            <small>Aguardando primeiro contato</small>
+          </article>
+          <article>
+            <span>Em atendimento</span>
+            <strong>{{ activeEvaluations() }}</strong>
+            <small>Negociacao em andamento</small>
+          </article>
+          <article>
+            <span>Finalizadas</span>
+            <strong>{{ closedEvaluations() }}</strong>
+            <small>Historico concluido</small>
+          </article>
+        </div>
+
+        <div class="evaluation-toolbar">
+          <label>
+            <iconify-icon icon="lucide:search"></iconify-icon>
+            <input type="search" placeholder="Buscar por cliente, veiculo, telefone..." [ngModel]="evaluationSearch()" (ngModelChange)="setEvaluationSearch($event)" [ngModelOptions]="{ standalone: true }">
+          </label>
+
+          <div class="status-filter" aria-label="Filtro rapido por avaliacao">
+            @for (status of evaluationStatusFilters; track status) {
+              <button type="button" [class.is-active]="evaluationStatusFilter() === status" (click)="setEvaluationStatusFilter(status)">
+                {{ status }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="evaluation-board proposal-board">
+          @for (lead of filteredEvaluations(); track lead.id) {
+            <article class="evaluation-card">
+              <div class="evaluation-card__header">
+                <span>{{ normalizedProposalStatus(lead) }}</span>
+                <small>#{{ lead.id }}</small>
+              </div>
+              <strong>{{ lead.customerName || 'Cliente sem nome' }}</strong>
+              <p>{{ lead.make }} {{ lead.model }} {{ lead.year ? '- ' + lead.year : '' }}</p>
+              <div class="evaluation-details">
+                <span>
+                  <iconify-icon icon="lucide:phone"></iconify-icon>
+                  {{ lead.customerPhone || 'Telefone nao informado' }}
+                </span>
+                <span>
+                  <iconify-icon icon="lucide:mail"></iconify-icon>
+                  {{ lead.customerEmail || 'E-mail nao informado' }}
+                </span>
+                <span>
+                  <iconify-icon icon="lucide:gauge"></iconify-icon>
+                  {{ lead.mileage | number:'1.0-0':'pt-BR' }} km
+                </span>
+                <span>
+                  <iconify-icon icon="lucide:settings"></iconify-icon>
+                  {{ lead.transmission || 'Cambio nao informado' }}
+                </span>
+              </div>
+              <blockquote>{{ lead.message || lead.history || 'Sem observacoes adicionais.' }}</blockquote>
+              <div class="proposal-actions">
+                <button type="button" (click)="updateProposalStatus(lead, 'Em atendimento')">
+                  <iconify-icon icon="lucide:headphones"></iconify-icon>
+                  Atender
+                </button>
+                <button type="button" (click)="updateProposalStatus(lead, 'Finalizada')">
+                  <iconify-icon icon="lucide:check-check"></iconify-icon>
+                  Finalizar
+                </button>
+                <button type="button" class="danger-action" (click)="deleteProposal(lead)">
+                  <iconify-icon icon="lucide:trash-2"></iconify-icon>
+                  Remover
+                </button>
+              </div>
+            </article>
+          } @empty {
+            <article class="evaluation-empty">
+              <iconify-icon icon="lucide:clipboard-check"></iconify-icon>
+              <span>Sem avaliacoes</span>
+              <strong>Nenhuma avaliacao recebida ainda</strong>
+              <p>As solicitações enviadas pelo formulário Avaliação aparecem aqui.</p>
             </article>
           }
         </div>
@@ -206,20 +818,99 @@
     }
 
     @if (activeView() === 'settings') {
-      <section class="panel-card">
+      <section class="panel-card settings-manager">
         <div class="panel-heading">
           <div>
             <span class="eyebrow">Configuracoes</span>
-            <h2>Dados da loja e integracoes</h2>
+            <h2>Segurança e integrações</h2>
           </div>
-          <button class="primary-action" type="button">Salvar ajustes</button>
+          <button class="primary-action" type="button" (click)="changePassword()">
+            <iconify-icon icon="lucide:key-round"></iconify-icon>
+            Salvar senha
+          </button>
         </div>
 
-        <div class="form-grid">
-          <label>Nome da loja <input value="Velvet Motors"></label>
-          <label>WhatsApp <input value="(11) 99999-0000"></label>
-          <label>Endereco <input value="Av. Europa, 000 - Sao Paulo, SP"></label>
-          <label>API de veiculos <input value="https://www.ictapi.com.br/Velvet/Home"></label>
+        <div class="settings-layout">
+          <article class="settings-card settings-card--security">
+            <div>
+              <span class="eyebrow">Acesso administrativo</span>
+              <h3>Alterar senha do painel</h3>
+              <p>Use este bloco apenas para atualizar a senha do usuario administrativo atual.</p>
+            </div>
+
+            <div class="form-grid">
+              <label>Senha atual <input type="password" autocomplete="current-password" [ngModel]="currentPassword()" (ngModelChange)="currentPassword.set($event)" name="currentPassword"></label>
+              <label>Nova senha <input type="password" autocomplete="new-password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" name="newPassword"></label>
+              <label class="span-2">Confirmar nova senha <input type="password" autocomplete="new-password" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" name="confirmPassword"></label>
+            </div>
+          </article>
+
+          <article class="settings-card">
+            <div>
+              <span class="eyebrow">Operacao atual</span>
+              <h3>Dados usados pelo site</h3>
+            </div>
+
+            <div class="settings-info-grid">
+              <div>
+                <iconify-icon icon="lucide:store"></iconify-icon>
+                <span>Loja</span>
+                <strong>{{ siteContent().brandName }}</strong>
+              </div>
+              <div>
+                <iconify-icon icon="lucide:phone"></iconify-icon>
+                <span>WhatsApp</span>
+                <strong>{{ siteContent().phone }}</strong>
+              </div>
+              <div>
+                <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                <span>Endereco</span>
+                <strong>{{ siteContent().address }}</strong>
+              </div>
+              <div>
+                <iconify-icon icon="lucide:cloud"></iconify-icon>
+                <span>API principal</span>
+                <strong>https://www.ictapi.com.br/Velvet</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="settings-card settings-card--integrations">
+            <div class="settings-section-heading">
+              <div>
+                <span class="eyebrow">Integracoes</span>
+                <h3>Conectores futuros</h3>
+              </div>
+              <span class="development-pill">Em desenvolvimento</span>
+            </div>
+
+            <div class="integration-grid">
+              <div>
+                <iconify-icon icon="lucide:mail-check"></iconify-icon>
+                <strong>E-mail transacional</strong>
+                <span>Envio de propostas, alertas e copias comerciais.</span>
+                <small>Em desenvolvimento</small>
+              </div>
+              <div>
+                <iconify-icon icon="lucide:line-chart"></iconify-icon>
+                <strong>Analytics</strong>
+                <span>Eventos de busca, cliques em detalhes e conversoes.</span>
+                <small>Em desenvolvimento</small>
+              </div>
+              <div>
+                <iconify-icon icon="lucide:database-zap"></iconify-icon>
+                <strong>Estoque externo</strong>
+                <span>Sincronizacao com sistemas de frota e ERP.</span>
+                <small>Em desenvolvimento</small>
+              </div>
+              <div>
+                <iconify-icon icon="lucide:message-circle"></iconify-icon>
+                <strong>CRM / WhatsApp</strong>
+                <span>Distribuicao de leads e historico comercial.</span>
+                <small>Em desenvolvimento</small>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
     }
