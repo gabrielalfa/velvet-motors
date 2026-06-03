@@ -38,6 +38,17 @@ export class AdminPanelComponent {
 
   readonly activeView = signal<AdminView>('dashboard');
   readonly vehicles = computed(() => this.inventoryService.vehicles());
+  readonly vehicleBrands = computed(() => this.inventoryService.vehicleBrands());
+  readonly vehicleBrandOptions = computed(() => {
+    const brands = [...this.vehicleBrands()];
+    const selectedBrand = (this.editingVehicle.brand ?? '').trim();
+
+    if (selectedBrand && !brands.some((brand) => brand.name.toLowerCase() === selectedBrand.toLowerCase())) {
+      brands.push({ id: 0, name: selectedBrand, active: true });
+    }
+
+    return brands.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  });
   readonly banners = computed(() => this.inventoryService.banners());
   readonly sortedBanners = computed(() => [...this.banners()]
     .sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99)));
@@ -53,6 +64,8 @@ export class AdminPanelComponent {
   readonly vehicleEditorOpen = signal(false);
   readonly vehicleEditorStep = signal<VehicleEditorStep>('general');
   readonly highlightsOpen = signal(false);
+  readonly brandCanvasOpen = signal(false);
+  readonly newBrandName = signal('');
   readonly vehiclePage = signal(1);
   readonly vehiclePageSize = 5;
   readonly vehicleSearch = signal('');
@@ -194,6 +207,7 @@ export class AdminPanelComponent {
     });
 
     this.loadAdminVehicles();
+    this.inventoryService.loadVehicleBrands();
     this.inventoryService.loadBanners();
     this.loadProposals();
   }
@@ -253,6 +267,9 @@ export class AdminPanelComponent {
   editVehicle(vehicle: Vehicle): void {
     this.activeView.set('fleet');
     this.editingVehicle = { ...this.createVehicleDraft(), ...vehicle };
+    if (this.editingVehicle.brand) {
+      this.inventoryService.addVehicleBrand({ id: 0, name: this.editingVehicle.brand, active: true });
+    }
     this.vehicleEditorStep.set('general');
     this.vehicleEditorOpen.set(true);
   }
@@ -270,6 +287,16 @@ export class AdminPanelComponent {
 
   closeHighlights(): void {
     this.highlightsOpen.set(false);
+  }
+
+  openBrandCanvas(): void {
+    this.newBrandName.set('');
+    this.brandCanvasOpen.set(true);
+  }
+
+  closeBrandCanvas(): void {
+    this.brandCanvasOpen.set(false);
+    this.newBrandName.set('');
   }
 
   setVehicleEditorStep(step: VehicleEditorStep): void {
@@ -454,6 +481,40 @@ export class AdminPanelComponent {
         this.editingVehicle = this.createVehicleDraft();
         this.vehicleEditorOpen.set(false);
       }
+    });
+  }
+
+  saveBrand(): void {
+    const token = this.authService.token();
+    const name = this.newBrandName().trim();
+
+    if (!token) {
+      this.router.navigateByUrl('/admin/login');
+      return;
+    }
+
+    if (!name) {
+      this.showFeedback('Informe o nome da marca.', 'error');
+      return;
+    }
+
+    this.saving.set(true);
+    this.clearFeedback();
+
+    this.inventoryService.saveVehicleBrand(name, token).subscribe((result) => {
+      this.saving.set(false);
+      this.showFeedback(
+        this.inventoryService.operationMessage(result) || 'Marca cadastrada.',
+        this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
+      );
+
+      if (this.inventoryService.operationSucceeded(result)) {
+        this.editingVehicle.brand = name;
+        this.closeBrandCanvas();
+      }
+    }, () => {
+      this.saving.set(false);
+      this.showFeedback('Nao foi possivel cadastrar a marca.', 'error');
     });
   }
 

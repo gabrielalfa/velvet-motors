@@ -53,6 +53,13 @@ export interface BrandLogo {
   name: string;
 }
 
+export interface VehicleBrand {
+  id: number;
+  name: string;
+  active?: boolean;
+  sortOrder?: number;
+}
+
 export interface Difference {
   icon: string;
   title: string;

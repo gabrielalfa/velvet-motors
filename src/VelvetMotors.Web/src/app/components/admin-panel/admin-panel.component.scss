@@ -1146,6 +1146,66 @@
   color: #fff8ef;
 }
 
+.brand-field {
+  min-width: 0;
+}
+
+.brand-select-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 52px;
+}
+
+.brand-add-button {
+  align-items: center;
+  background: rgba(242, 180, 57, 0.13);
+  border: 1px solid rgba(242, 180, 57, 0.38);
+  border-radius: 14px;
+  color: var(--accent-hover);
+  display: inline-flex;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.brand-add-button iconify-icon {
+  font-size: 1.25rem;
+}
+
+.brand-panel {
+  align-content: start;
+}
+
+.brand-form {
+  gap: 18px;
+}
+
+.brand-preview {
+  display: grid;
+  gap: 12px;
+}
+
+.brand-preview strong {
+  color: #fff8ef;
+  font-size: 0.84rem;
+}
+
+.brand-preview div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brand-preview span {
+  background: rgba(255, 248, 239, 0.06);
+  border: 1px solid rgba(255, 248, 239, 0.12);
+  border-radius: 999px;
+  color: rgba(255, 248, 239, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 8px 11px;
+}
+
 .form-grid textarea {
   min-height: 112px;
   padding: 14px;

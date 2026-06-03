@@ -29,7 +29,7 @@ async function createVehicle(page: import('@playwright/test').Page, name: string
   await expect(page.getByTestId('vehicle-editor')).toBeVisible();
 
   await page.getByTestId('vehicle-name-input').fill(name);
-  await page.getByTestId('vehicle-brand-input').fill('Velvet Test');
+  await page.getByTestId('vehicle-brand-input').selectOption('BMW');
   await page.getByTestId('vehicle-year-input').fill('2026');
   await page.getByTestId('vehicle-price-input').fill('150000');
   await page.getByTestId('vehicle-km-input').fill('1234');

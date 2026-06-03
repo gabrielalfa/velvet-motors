@@ -13,6 +13,8 @@ export const apiConfig = {
   velvetSiteContentUrl: `${velvetBaseUrl}/SiteContent`,
   velvetSaveSiteContentUrl: `${velvetBaseUrl}/SaveSiteContent`,
   velvetBannersUrl: `${velvetBaseUrl}/Banners`,
+  velvetBrandsUrl: `${velvetBaseUrl}/Brands`,
+  velvetInsertBrandUrl: `${velvetBaseUrl}/InsertBrand`,
   velvetVehiclesUrl: `${velvetBaseUrl}/Vehicles`,
   velvetAdminVehiclesUrl: `${velvetBaseUrl}/AdminVehicles`,
   velvetVehicleUrl: `${velvetBaseUrl}/Vehicle`,

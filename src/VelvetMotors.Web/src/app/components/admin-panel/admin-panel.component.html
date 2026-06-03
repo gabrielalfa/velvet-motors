@@ -287,7 +287,19 @@
                 @if (vehicleEditorStep() === 'general') {
                   <div class="form-grid">
                     <label>Nome do veiculo <input data-testid="vehicle-name-input" name="vehicleName" [(ngModel)]="editingVehicle.name"></label>
-                    <label>Marca <input data-testid="vehicle-brand-input" name="vehicleBrand" [(ngModel)]="editingVehicle.brand" placeholder="BMW, Audi, Mercedes"></label>
+                    <label class="brand-field">Marca
+                      <span class="brand-select-row">
+                        <select data-testid="vehicle-brand-input" name="vehicleBrand" [(ngModel)]="editingVehicle.brand">
+                          <option value="">Selecione a marca</option>
+                          @for (brand of vehicleBrandOptions(); track brand.name) {
+                            <option [value]="brand.name">{{ brand.name }}</option>
+                          }
+                        </select>
+                        <button class="brand-add-button" type="button" aria-label="Cadastrar nova marca" (click)="openBrandCanvas()">
+                          <iconify-icon icon="lucide:plus"></iconify-icon>
+                        </button>
+                      </span>
+                    </label>
                     <label>Ano <input data-testid="vehicle-year-input" name="vehicleYear" type="number" [(ngModel)]="editingVehicle.year"></label>
                     <label>Valor <input data-testid="vehicle-price-input" name="vehiclePrice" type="number" [(ngModel)]="editingVehicle.price"></label>
                     <label>Km <input data-testid="vehicle-km-input" name="vehicleKm" type="number" [(ngModel)]="editingVehicle.km"></label>
@@ -511,6 +523,47 @@
               <iconify-icon icon="lucide:save"></iconify-icon>
               Salvar destaques
             </button>
+          </aside>
+        </div>
+
+        <div class="highlight-canvas" [class.highlight-canvas--open]="brandCanvasOpen()">
+          <button class="highlight-canvas__backdrop" type="button" aria-label="Fechar cadastro de marca" (click)="closeBrandCanvas()"></button>
+          <aside class="highlight-panel brand-panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <span class="eyebrow">Marca</span>
+                <h2>Cadastrar nova marca</h2>
+              </div>
+              <button class="ghost-action" type="button" (click)="closeBrandCanvas()">Fechar</button>
+            </div>
+
+            <form class="admin-editor brand-form" (ngSubmit)="saveBrand()">
+              <div class="form-grid">
+                <label class="span-2">Nome da marca
+                  <input
+                    data-testid="brand-name-input"
+                    name="brandName"
+                    autocomplete="off"
+                    [ngModel]="newBrandName()"
+                    (ngModelChange)="newBrandName.set($event)"
+                    placeholder="Ex: Mercedes-Benz">
+                </label>
+              </div>
+
+              <div class="brand-preview">
+                <strong>Marcas cadastradas</strong>
+                <div>
+                  @for (brand of vehicleBrands(); track brand.name) {
+                    <span>{{ brand.name }}</span>
+                  }
+                </div>
+              </div>
+
+              <button class="primary-action" data-testid="save-brand-button" type="submit" [disabled]="saving()">
+                <iconify-icon icon="lucide:save"></iconify-icon>
+                {{ saving() ? 'Salvando...' : 'Salvar marca' }}
+              </button>
+            </form>
           </aside>
         </div>
       </section>

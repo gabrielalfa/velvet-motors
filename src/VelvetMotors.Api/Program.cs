@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using VelvetMotors.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +36,18 @@ var vehicles = new[]
     new VehicleDto(5, "Jeep Compass Limited", 2024, 9200, 172900, "/images/cars/car-5.jpg", "Garantia ativa", "Automatico", "Diesel")
 };
 
+var brands = new List<BrandDto>
+{
+    new(1, "BMW", true, 1),
+    new(2, "Audi", true, 2),
+    new(3, "Mercedes", true, 3),
+    new(4, "Porsche", true, 4),
+    new(5, "Volvo", true, 5),
+    new(6, "Jeep", true, 6),
+    new(7, "Toyota", true, 7),
+    new(8, "Land Rover", true, 8)
+};
+
 app.MapGet("/api/health", () => Results.Ok(new
 {
     status = "online",
@@ -52,4 +66,52 @@ app.MapGet("/api/vehicles/{id:int}", (int id) =>
 })
 .WithName("GetVehicleById");
 
+app.MapGet("/Velvet/Brands", () => Results.Ok(brands.Where(item => item.Active)))
+    .WithName("GetVelvetBrands");
+
+app.MapPost("/Velvet/InsertBrand", (BrandRequest request) =>
+{
+    var name = NormalizeBrandName(request.Name ?? string.Empty);
+
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        return Results.BadRequest(new { Success = false, Message = "Informe o nome da marca." });
+    }
+
+    var existing = brands.FirstOrDefault(item => BrandKey(item.Name) == BrandKey(name));
+
+    if (existing is not null)
+    {
+        return Results.Conflict(new { Success = false, Message = "Esta marca ja esta cadastrada.", existing.Id });
+    }
+
+    var id = brands.Count == 0 ? 1 : brands.Max(item => item.Id) + 1;
+    var brand = new BrandDto(id, name, request.Active, brands.Count + 1);
+    brands.Add(brand);
+
+    return Results.Ok(new { Success = true, Message = "Marca cadastrada com sucesso.", brand.Id });
+})
+.WithName("InsertVelvetBrand");
+
 app.Run();
+
+static string NormalizeBrandName(string name)
+{
+    return string.Join(' ', name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries));
+}
+
+static string BrandKey(string name)
+{
+    var normalized = NormalizeBrandName(name).Normalize(NormalizationForm.FormD);
+    var builder = new StringBuilder(capacity: normalized.Length);
+
+    foreach (var character in normalized)
+    {
+        if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
+        {
+            builder.Append(char.ToLowerInvariant(character));
+        }
+    }
+
+    return builder.ToString().Normalize(NormalizationForm.FormC);
+}

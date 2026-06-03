@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, map, Observable, of, tap } from 'rxjs';
 import { apiConfig } from '../config/api.config';
 import { SiteContent } from '../models/site-content.model';
-import { BrandLogo, Difference, HeroBanner, Vehicle, VelvetHomeResponse, VelvetOperationResult } from '../models/vehicle.model';
+import { BrandLogo, Difference, HeroBanner, Vehicle, VehicleBrand, VelvetHomeResponse, VelvetOperationResult } from '../models/vehicle.model';
 import { SiteContentService } from './site-content.service';
 
 type ApiHomeResponse = {
@@ -93,6 +93,17 @@ type ApiVehicle = {
   sortOrder?: number;
 };
 
+type ApiVehicleBrand = {
+  Id?: number;
+  Name?: string;
+  Active?: boolean;
+  SortOrder?: number;
+  id?: number;
+  name?: string;
+  active?: boolean;
+  sortOrder?: number;
+};
+
 const fallbackBanners: HeroBanner[] = [
   {
     id: 1,
@@ -172,6 +183,17 @@ const fallbackVehicles: Vehicle[] = [
   }
 ];
 
+const fallbackVehicleBrands: VehicleBrand[] = [
+  { id: 1, name: 'BMW', active: true, sortOrder: 1 },
+  { id: 2, name: 'Audi', active: true, sortOrder: 2 },
+  { id: 3, name: 'Mercedes', active: true, sortOrder: 3 },
+  { id: 4, name: 'Porsche', active: true, sortOrder: 4 },
+  { id: 5, name: 'Volvo', active: true, sortOrder: 5 },
+  { id: 6, name: 'Jeep', active: true, sortOrder: 6 },
+  { id: 7, name: 'Toyota', active: true, sortOrder: 7 },
+  { id: 8, name: 'Land Rover', active: true, sortOrder: 8 }
+];
+
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
   private readonly http = inject(HttpClient);
@@ -180,6 +202,7 @@ export class InventoryService {
   readonly loading = signal(true);
   readonly banners = signal<HeroBanner[]>(fallbackBanners);
   readonly vehicles = signal<Vehicle[]>(fallbackVehicles);
+  readonly vehicleBrands = signal<VehicleBrand[]>(this.createDefaultVehicleBrands());
   readonly selectedVehicle = signal<Vehicle | null>(null);
 
   readonly brands: BrandLogo[] = [
@@ -233,6 +256,7 @@ export class InventoryService {
 
       this.banners.set(homeData.banners.length ? homeData.banners : fallbackBanners);
       this.vehicles.set(homeData.featuredCars.length ? homeData.featuredCars : fallbackVehicles);
+      this.mergeVehicleBrandsFromVehicles(this.vehicles());
     });
   }
 
@@ -243,6 +267,7 @@ export class InventoryService {
       finalize(() => this.loading.set(false))
     ).subscribe((vehicles) => {
       this.vehicles.set(vehicles.length ? vehicles : fallbackVehicles);
+      this.mergeVehicleBrandsFromVehicles(this.vehicles());
     });
   }
 
@@ -266,6 +291,19 @@ export class InventoryService {
       finalize(() => this.loading.set(false))
     ).subscribe((vehicles) => {
       this.vehicles.set(vehicles);
+      this.mergeVehicleBrandsFromVehicles(vehicles);
+    });
+  }
+
+  loadVehicleBrands(): void {
+    this.http.get<ApiVehicleBrand[]>(apiConfig.velvetBrandsUrl).pipe(
+      map((brands) => brands.map((brand) => this.normalizeVehicleBrand(brand))),
+      catchError((error) => {
+        console.error('Falha ao carregar marcas da API Velvet/Brands. Usando marcas da frota atual.', error);
+        return of(this.createVehicleBrandsFromVehicles(this.vehicles()));
+      })
+    ).subscribe((brands) => {
+      this.vehicleBrands.set(this.mergeVehicleBrands([...this.vehicleBrands(), ...brands]));
     });
   }
 
@@ -318,6 +356,52 @@ export class InventoryService {
         }
       })
     );
+  }
+
+  saveVehicleBrand(name: string, token: string): Observable<VelvetOperationResult> {
+    const normalizedName = this.normalizeBrandName(name);
+
+    if (!normalizedName) {
+      return of({ success: false, message: 'Informe o nome da marca.' });
+    }
+
+    const existing = this.vehicleBrands().find((brand) => this.brandKey(brand.name) === this.brandKey(normalizedName));
+
+    if (existing) {
+      return of({ success: false, message: 'Esta marca ja esta cadastrada.' });
+    }
+
+    return this.http.post<VelvetOperationResult>(apiConfig.velvetInsertBrandUrl, {
+      token,
+      name: normalizedName,
+      active: true
+    }).pipe(
+      tap((result) => {
+        if (this.operationSucceeded(result)) {
+          const id = result.Id ?? result.id ?? 0;
+          this.addVehicleBrand({ id, name: normalizedName, active: true });
+        }
+      }),
+      catchError((error) => {
+        console.error('Falha ao cadastrar marca na API Velvet/InsertBrand.', error);
+        this.addVehicleBrand({ id: 0, name: normalizedName, active: true });
+        return of({
+          ...this.createOperationResultFromError(error, 'Nao foi possivel cadastrar a marca agora.'),
+          success: true,
+          message: `${this.errorMessage(error, 'Nao foi possivel cadastrar a marca agora.')} Marca adicionada apenas neste cadastro ate o endpoint InsertBrand ser publicado.`
+        });
+      })
+    );
+  }
+
+  addVehicleBrand(brand: VehicleBrand): void {
+    this.vehicleBrands.set(this.mergeVehicleBrands([
+      ...this.vehicleBrands(),
+      {
+        ...brand,
+        name: this.normalizeBrandName(brand.name)
+      }
+    ]));
   }
 
   deleteVehicle(id: number, token: string): Observable<VelvetOperationResult> {
@@ -384,6 +468,40 @@ export class InventoryService {
     return result.Message ?? result.message ?? '';
   }
 
+  private createOperationResultFromError(error: unknown, fallbackMessage: string): VelvetOperationResult {
+    return {
+      success: false,
+      message: this.errorMessage(error, fallbackMessage)
+    };
+  }
+
+  private errorMessage(error: unknown, fallbackMessage: string): string {
+    const payload = (error as { error?: unknown })?.error;
+
+    if (payload && typeof payload === 'object') {
+      const message = (payload as VelvetOperationResult).Message ?? (payload as VelvetOperationResult).message;
+
+      if (message) {
+        return message;
+      }
+    }
+
+    if (typeof payload === 'string') {
+      const title = payload.match(/<title>(.*?)<\/title>/i)?.[1]
+        ?.replace(/&#225;/g, 'á')
+        ?.replace(/&#227;/g, 'ã')
+        ?.replace(/&#234;/g, 'ê')
+        ?.replace(/&nbsp;/g, ' ')
+        ?.trim();
+
+      if (title) {
+        return title;
+      }
+    }
+
+    return fallbackMessage;
+  }
+
   private normalizeHomeResponse(response: ApiHomeResponse): VelvetHomeResponse {
     const banners = response.Banners ?? response.banners ?? [];
     const featuredCars = response.FeaturedCars ?? response.featuredCars ?? [];
@@ -444,6 +562,15 @@ export class InventoryService {
     };
   }
 
+  private normalizeVehicleBrand(brand: ApiVehicleBrand): VehicleBrand {
+    return {
+      id: brand.Id ?? brand.id ?? 0,
+      name: this.normalizeBrandName(brand.Name ?? brand.name ?? ''),
+      active: brand.Active ?? brand.active ?? true,
+      sortOrder: brand.SortOrder ?? brand.sortOrder ?? 0
+    };
+  }
+
   private isDeletedVehicle(vehicle: ApiVehicle): boolean {
     const active = vehicle.Active ?? vehicle.active ?? true;
     const listingStatus = (vehicle.ListingStatus ?? vehicle.listingStatus ?? '').trim();
@@ -485,6 +612,60 @@ export class InventoryService {
       active: vehicle.active ?? true,
       sortOrder: vehicle.sortOrder ?? vehicle.id
     };
+  }
+
+  private createDefaultVehicleBrands(): VehicleBrand[] {
+    return [...fallbackVehicleBrands];
+  }
+
+  private createVehicleBrandsFromVehicles(vehicles: Vehicle[]): VehicleBrand[] {
+    return vehicles
+      .map((vehicle) => (vehicle.brand ?? '').trim())
+      .filter(Boolean)
+      .map((name, index) => ({ id: index + 1, name, active: true, sortOrder: index + 1 }));
+  }
+
+  private mergeVehicleBrandsFromVehicles(vehicles: Vehicle[]): void {
+    this.vehicleBrands.set(this.mergeVehicleBrands([
+      ...this.vehicleBrands(),
+      ...this.createVehicleBrandsFromVehicles(vehicles)
+    ]));
+  }
+
+  private mergeVehicleBrands(brands: VehicleBrand[]): VehicleBrand[] {
+    const mapByName = new Map<string, VehicleBrand>();
+
+    brands
+      .filter((brand) => brand.name.trim())
+      .forEach((brand) => {
+        const key = this.brandKey(brand.name);
+        const current = mapByName.get(key);
+        const normalizedName = this.normalizeBrandName(current?.name ?? brand.name);
+
+        mapByName.set(key, {
+          ...current,
+          ...brand,
+          name: normalizedName,
+          id: brand.id || current?.id || 0,
+          active: brand.active ?? current?.active ?? true,
+          sortOrder: brand.sortOrder ?? current?.sortOrder ?? 99
+        });
+      });
+
+    return [...mapByName.values()]
+      .filter((brand) => brand.active ?? true)
+      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  }
+
+  private normalizeBrandName(name: string): string {
+    return name.trim().replace(/\s+/g, ' ');
+  }
+
+  private brandKey(name: string): string {
+    return this.normalizeBrandName(name)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   }
 
   uploadVehicleMedia(file: File, token: string, scope = 'vehicles'): Observable<VelvetOperationResult & { url?: string; Url?: string }> {
