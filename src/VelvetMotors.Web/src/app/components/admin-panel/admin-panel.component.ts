@@ -163,31 +163,31 @@ export class AdminPanelComponent {
 
   readonly menu: Array<{ id: AdminView; label: string; icon: string }> = [
     { id: 'dashboard', label: 'Dashboard', icon: 'lucide:layout-dashboard' },
-    { id: 'content', label: 'Conteudo do site', icon: 'lucide:file-pen-line' },
-    { id: 'fleet', label: 'Veiculos', icon: 'lucide:car-front' },
+    { id: 'content', label: 'Conteúdo do site', icon: 'lucide:file-pen-line' },
+    { id: 'fleet', label: 'Veículos', icon: 'lucide:car-front' },
     { id: 'showcase', label: 'Carrossel inicial', icon: 'lucide:images' },
-    { id: 'compare', label: 'Comparacao', icon: 'lucide:git-compare' },
+    { id: 'compare', label: 'Comparação', icon: 'lucide:git-compare' },
     { id: 'leads', label: 'Avaliações', icon: 'lucide:clipboard-check' },
-    { id: 'settings', label: 'Configuracoes', icon: 'lucide:settings' }
+    { id: 'settings', label: 'Configurações', icon: 'lucide:settings' }
   ];
   readonly vehicleEditorSteps: Array<{ id: VehicleEditorStep; label: string; icon: string }> = [
     { id: 'general', label: 'Dados gerais', icon: 'lucide:badge-info' },
     { id: 'media', label: 'Fotos e video', icon: 'lucide:images' },
-    { id: 'description', label: 'Descricao', icon: 'lucide:file-text' },
+    { id: 'description', label: 'Descrição', icon: 'lucide:file-text' },
     { id: 'technical', label: 'Tecnica', icon: 'lucide:gauge' },
     { id: 'features', label: 'Itens', icon: 'lucide:list-checks' }
   ];
-  readonly vehicleStatusFilters = ['Todos', 'Publicado', 'Nao publicado', 'Vendido', 'Reservado'];
+  readonly vehicleStatusFilters = ['Todos', 'Publicado', 'Não publicado', 'Vendido', 'Reservado'];
   readonly evaluationStatusFilters = ['Todos', 'Nova', 'Em atendimento', 'Finalizada'];
   readonly compareFields: CompareField[] = [
-    { id: 'condition', label: 'Condicao', icon: 'lucide:badge-check', sample: 'Selecionado', group: 'Perfil' },
+    { id: 'condition', label: 'Condição', icon: 'lucide:badge-check', sample: 'Selecionado', group: 'Perfil' },
     { id: 'body', label: 'Carroceria', icon: 'lucide:car-front', sample: 'Sedan', group: 'Perfil' },
     { id: 'brand', label: 'Marca', icon: 'lucide:landmark', sample: 'BMW', group: 'Identificacao' },
     { id: 'model', label: 'Modelo', icon: 'lucide:signature', sample: 'BMW 320i M Sport', group: 'Identificacao' },
-    { id: 'fuel', label: 'Combustivel', icon: 'lucide:fuel', sample: 'Flex', group: 'Tecnica' },
+    { id: 'fuel', label: 'Combustível', icon: 'lucide:fuel', sample: 'Flex', group: 'Tecnica' },
     { id: 'engine', label: 'Motor', icon: 'lucide:cpu', sample: '2.0 Turbo', group: 'Tecnica' },
     { id: 'year', label: 'Ano', icon: 'lucide:calendar-days', sample: '2023', group: 'Dados' },
-    { id: 'transmission', label: 'Cambio', icon: 'lucide:settings', sample: 'Automatico', group: 'Tecnica' },
+    { id: 'transmission', label: 'Câmbio', icon: 'lucide:settings', sample: 'Automático', group: 'Tecnica' },
     { id: 'mileage', label: 'Quilometragem', icon: 'lucide:gauge', sample: '18.400 km', group: 'Dados' },
     { id: 'price', label: 'Valor', icon: 'lucide:badge-dollar-sign', sample: 'R$ 189.900', group: 'Comercial' },
     { id: 'exteriorColor', label: 'Cor externa', icon: 'lucide:sparkles', sample: 'Sob consulta', group: 'Acabamento' },
@@ -249,7 +249,7 @@ export class AdminPanelComponent {
     this.siteContentService.save(this.editingContent, token).subscribe((result) => {
       this.saving.set(false);
       this.showFeedback(
-        this.siteContentService.operationMessage(result) || 'Conteudo do site atualizado.',
+        this.siteContentService.operationMessage(result) || 'Conteúdo do site atualizado.',
         this.siteContentService.operationSucceeded(result) ? 'success' : 'error'
       );
 
@@ -358,7 +358,7 @@ export class AdminPanelComponent {
         if (completed === preparedFiles.length) {
           this.saving.set(false);
           this.showFeedback(uploaded
-            ? `${uploaded} imagem(ns) adicionada(s) ao veiculo.`
+            ? `${uploaded} imagem(ns) adicionada(s) ao veículo.`
             : 'Nenhuma imagem foi adicionada.');
         }
       });
@@ -398,7 +398,7 @@ export class AdminPanelComponent {
     const nextSortOrder = this.highlightVehicles().length + 1;
 
     if (!wasFeatured && this.highlightVehicles().length >= 7) {
-      this.showFeedback('Voce pode destacar ate 7 veiculos na home.', 'error');
+      this.showFeedback('Você pode destacar até 7 veículos na home.', 'error');
       return;
     }
 
@@ -413,7 +413,7 @@ export class AdminPanelComponent {
     this.inventoryService.saveVehicle(vehicle, token, false).subscribe((result) => {
       this.showFeedback(
         this.inventoryService.operationSucceeded(result)
-          ? (vehicle.featured ? 'Veiculo adicionado aos destaques.' : 'Veiculo removido dos destaques.')
+          ? (vehicle.featured ? 'Veículo adicionado aos destaques.' : 'Veículo removido dos destaques.')
           : this.inventoryService.operationMessage(result),
         this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
       );
@@ -514,7 +514,7 @@ export class AdminPanelComponent {
       }
     }, () => {
       this.saving.set(false);
-      this.showFeedback('Nao foi possivel cadastrar a marca.', 'error');
+      this.showFeedback('Não foi possível cadastrar a marca.', 'error');
     });
   }
 
@@ -531,13 +531,13 @@ export class AdminPanelComponent {
     this.inventoryService.deleteVehicle(vehicle.id, token).subscribe((result) => {
       this.saving.set(false);
       this.showFeedback(
-        this.inventoryService.operationMessage(result) || 'Veiculo removido da frota.',
+        this.inventoryService.operationMessage(result) || 'Veículo removido da frota.',
         this.inventoryService.operationSucceeded(result) ? 'success' : 'error'
       );
       this.vehiclePage.set(this.activeVehiclePage());
     }, () => {
       this.saving.set(false);
-      this.showFeedback('Nao foi possivel remover o veiculo no banco de dados.', 'error');
+      this.showFeedback('Não foi possível remover o veículo no banco de dados.', 'error');
     });
   }
 
@@ -567,7 +567,7 @@ export class AdminPanelComponent {
     const evaluations = this.filteredEvaluations();
 
     if (!evaluations.length) {
-      this.showFeedback('Nenhuma avaliacao encontrada para exportar.', 'error');
+      this.showFeedback('Nenhuma avaliação encontrada para exportar.', 'error');
       return;
     }
 
@@ -581,12 +581,12 @@ export class AdminPanelComponent {
         <h2>${this.escapeHtml(evaluation.customerName || 'Cliente sem nome')}</h2>
         <p class="vehicle">${this.escapeHtml([evaluation.make, evaluation.model, evaluation.year].filter(Boolean).join(' '))}</p>
         <dl>
-          <div><dt>Telefone</dt><dd>${this.escapeHtml(evaluation.customerPhone || 'Nao informado')}</dd></div>
-          <div><dt>E-mail</dt><dd>${this.escapeHtml(evaluation.customerEmail || 'Nao informado')}</dd></div>
+          <div><dt>Telefone</dt><dd>${this.escapeHtml(evaluation.customerPhone || 'Não informado')}</dd></div>
+          <div><dt>E-mail</dt><dd>${this.escapeHtml(evaluation.customerEmail || 'Não informado')}</dd></div>
           <div><dt>Quilometragem</dt><dd>${(evaluation.mileage || 0).toLocaleString('pt-BR')} km</dd></div>
-          <div><dt>Cambio</dt><dd>${this.escapeHtml(evaluation.transmission || 'Nao informado')}</dd></div>
-          <div><dt>Cor externa</dt><dd>${this.escapeHtml(evaluation.exteriorColor || 'Nao informada')}</dd></div>
-          <div><dt>Cor interna</dt><dd>${this.escapeHtml(evaluation.interiorColor || 'Nao informada')}</dd></div>
+          <div><dt>Câmbio</dt><dd>${this.escapeHtml(evaluation.transmission || 'Não informado')}</dd></div>
+          <div><dt>Cor externa</dt><dd>${this.escapeHtml(evaluation.exteriorColor || 'Não informada')}</dd></div>
+          <div><dt>Cor interna</dt><dd>${this.escapeHtml(evaluation.interiorColor || 'Não informada')}</dd></div>
         </dl>
         <p class="notes">${this.escapeHtml(evaluation.message || evaluation.history || 'Sem observacoes adicionais.')}</p>
       </article>
@@ -728,7 +728,7 @@ export class AdminPanelComponent {
       ...this.editingBanner,
       image: this.pendingBannerImagePreviewUrl
     };
-    this.showFeedback('Imagem selecionada. Confira a previa e clique em salvar para publicar.', 'success');
+      this.showFeedback('Imagem selecionada. Confira a prévia e clique em salvar para publicar.', 'success');
   }
 
   saveBanner(): void {
@@ -751,7 +751,7 @@ export class AdminPanelComponent {
 
           if (!rawUrl) {
             this.saving.set(false);
-            this.showFeedback(this.inventoryService.operationMessage(uploadResult) || 'Nao foi possivel enviar a imagem do banner.', 'error');
+            this.showFeedback(this.inventoryService.operationMessage(uploadResult) || 'Não foi possível enviar a imagem do banner.', 'error');
             return;
           }
 
@@ -904,7 +904,7 @@ export class AdminPanelComponent {
       condition: 'Selecionado',
       displayTag: 'Novidade',
       listingStatus: 'Publicado',
-      transmission: 'Automatico',
+      transmission: 'Automático',
       fuel: 'Flex',
       body: 'Sedan',
       engine: '',
@@ -990,7 +990,7 @@ export class AdminPanelComponent {
 
   private inferFeedbackType(message: string): FeedbackType {
     const normalized = message.toLowerCase();
-    const errorTerms = ['falha', 'erro', 'nao foi possivel', 'não foi possível', 'invalida', 'inválida', 'obrigatorio', 'obrigatório', 'confirme', 'nenhuma', 'limite', 'maximo', 'máximo'];
+    const errorTerms = ['falha', 'erro', 'não foi possível', 'não foi possível', 'invalida', 'inválida', 'obrigatorio', 'obrigatório', 'confirme', 'nenhuma', 'limite', 'maximo', 'máximo'];
 
     return errorTerms.some((term) => normalized.includes(term)) ? 'error' : 'success';
   }
@@ -1049,10 +1049,10 @@ export class AdminPanelComponent {
   }
 
   normalizedVehicleStatus(vehicle: Vehicle): string {
-    const status = vehicle.listingStatus || (vehicle.active ? 'Publicado' : 'Nao publicado');
+    const status = vehicle.listingStatus || (vehicle.active ? 'Publicado' : 'Não publicado');
 
-    if (status === 'Rascunho' || status === 'Nao publicado' || !vehicle.active) {
-      return 'Nao publicado';
+    if (status === 'Rascunho' || status === 'Não publicado' || !vehicle.active) {
+      return 'Não publicado';
     }
 
     return status;

@@ -37,7 +37,7 @@ export class AdminLoginComponent {
         return;
       }
 
-      this.errorMessage.set(this.authService.message(result) || 'Nao foi possivel entrar no painel.');
+      this.errorMessage.set(this.authService.message(result) || 'Não foi possível entrar no painel.');
     });
   }
 }

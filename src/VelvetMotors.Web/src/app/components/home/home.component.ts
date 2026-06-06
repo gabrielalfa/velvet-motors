@@ -81,7 +81,7 @@ export class HomeComponent implements OnDestroy {
         marca: this.quickBrand() === 'Todos' ? null : this.quickBrand(),
         modelo: this.quickModel().trim() || null,
         ano: this.quickYear() === 'Todos' ? null : this.quickYear(),
-        condicao: this.quickCondition() === 'Todos' ? null : this.quickCondition()
+        condição: this.quickCondition() === 'Todos' ? null : this.quickCondition()
       }
     });
   }

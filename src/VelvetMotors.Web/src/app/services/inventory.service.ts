@@ -108,19 +108,19 @@ const fallbackBanners: HeroBanner[] = [
   {
     id: 1,
     title: 'Showroom cinematografico',
-    headline: 'Seu proximo destino comeca aqui.',
+    headline: 'Seu próximo destino começa aqui.',
     image: '/images/banner/1.png'
   },
   {
     id: 2,
     title: 'Luz quente e cobre metalico',
-    headline: 'Mais do que veiculos. Uma experiencia Velvet.',
+    headline: 'Mais do que veículos. Uma experiência Velvet.',
     image: '/images/banner/2.png'
   },
   {
     id: 3,
-    title: 'Experiencia premium',
-    headline: 'Curadoria, procedencia e presenca em cada detalhe.',
+    title: 'Experiência premium',
+    headline: 'Curadoria, procedência e presença em cada detalhe.',
     image: '/images/banner/3.png'
   }
 ];
@@ -134,7 +134,7 @@ const fallbackVehicles: Vehicle[] = [
     price: 189900,
     image: '/images/cars/car-1.jpg',
     badge: 'Blindagem opcional',
-    transmission: 'Automatico',
+    transmission: 'Automático',
     fuel: 'Flex'
   },
   {
@@ -144,7 +144,7 @@ const fallbackVehicles: Vehicle[] = [
     km: 22100,
     price: 176900,
     image: '/images/cars/car-2.jpg',
-    badge: 'Unico dono',
+    badge: 'Único dono',
     transmission: 'S tronic',
     fuel: 'Gasolina'
   },
@@ -167,7 +167,7 @@ const fallbackVehicles: Vehicle[] = [
     price: 194900,
     image: '/images/cars/car-4.jpg',
     badge: 'Pacote safety',
-    transmission: 'Automatico',
+    transmission: 'Automático',
     fuel: 'Hibrido'
   },
   {
@@ -178,7 +178,7 @@ const fallbackVehicles: Vehicle[] = [
     price: 172900,
     image: '/images/cars/car-5.jpg',
     badge: 'Garantia ativa',
-    transmission: 'Automatico',
+    transmission: 'Automático',
     fuel: 'Diesel'
   }
 ];
@@ -218,19 +218,19 @@ export class InventoryService {
 
   readonly differences: Difference[] = [
     {
-      icon: 'verified',
-      title: 'Procedencia garantida',
-      description: 'Curadoria documental, historico revisado e vistoria criteriosa antes de cada anuncio.'
+      icon: 'Verificado',
+      title: 'Procedência garantida',
+      description: 'Curadoria documental, histórico revisado e vistoria criteriosa antes de cada anúncio.'
     },
     {
-      icon: 'concierge',
+      icon: 'Consultoria',
       title: 'Atendimento personalizado',
       description: 'Consultoria sob medida para conectar perfil, desejo e melhor oportunidade de compra.'
     },
     {
-      icon: 'diamond',
-      title: 'Veiculos selecionados',
-      description: 'Selecao enxuta, elegante e focada em carros com presenca, estado e liquidez.'
+      icon: 'Seleção',
+      title: 'Veículos selecionados',
+      description: 'Seleção enxuta, elegante e focada em carros com presença, estado e liquidez.'
     }
   ];
 
@@ -285,7 +285,7 @@ export class InventoryService {
           .map((vehicle) => this.normalizeVehicle(vehicle));
       }),
       catchError((error) => {
-        console.error('Falha ao carregar veiculos administrativos da API Velvet/AdminVehicles. Tentando lista publica.', error);
+        console.error('Falha ao carregar veículos administrativos da API Velvet/AdminVehicles. Tentando lista pública.', error);
         return this.getVehicles();
       }),
       finalize(() => this.loading.set(false))
@@ -329,7 +329,7 @@ export class InventoryService {
     return this.http.get<ApiVehicle[]>(apiConfig.velvetVehiclesUrl).pipe(
       map((vehicles) => vehicles.map((vehicle) => this.normalizeVehicle(vehicle))),
       catchError((error) => {
-        console.error('Falha ao carregar veiculos da API Velvet/Vehicles.', error);
+        console.error('Falha ao carregar veículos da API Velvet/Vehicles.', error);
         return of(fallbackVehicles);
       })
     );
@@ -339,7 +339,7 @@ export class InventoryService {
     return this.http.get<ApiVehicle | VelvetOperationResult>(`${apiConfig.velvetVehicleUrl}?id=${id}`).pipe(
       map((response) => this.isOperationFailure(response) ? null : this.normalizeVehicle(response as ApiVehicle)),
       catchError((error) => {
-        console.error('Falha ao carregar veiculo da API Velvet/Vehicle.', error);
+        console.error('Falha ao carregar veículo da API Velvet/Vehicle.', error);
         return of(fallbackVehicles.find((vehicle) => vehicle.id === id) ?? null);
       })
     );
@@ -386,9 +386,9 @@ export class InventoryService {
         console.error('Falha ao cadastrar marca na API Velvet/InsertBrand.', error);
         this.addVehicleBrand({ id: 0, name: normalizedName, active: true });
         return of({
-          ...this.createOperationResultFromError(error, 'Nao foi possivel cadastrar a marca agora.'),
+          ...this.createOperationResultFromError(error, 'Não foi possível cadastrar a marca agora.'),
           success: true,
-          message: `${this.errorMessage(error, 'Nao foi possivel cadastrar a marca agora.')} Marca adicionada apenas neste cadastro ate o endpoint InsertBrand ser publicado.`
+          message: `${this.errorMessage(error, 'Não foi possível cadastrar a marca agora.')} Marca adicionada apenas neste cadastro até o endpoint InsertBrand ser publicado.`
         });
       })
     );
@@ -542,7 +542,7 @@ export class InventoryService {
       condition: vehicle.Condition ?? vehicle.condition ?? '',
       displayTag: vehicle.DisplayTag ?? vehicle.displayTag ?? vehicle.Badge ?? vehicle.badge ?? '',
       listingStatus: vehicle.ListingStatus ?? vehicle.listingStatus ?? ((vehicle.Active ?? vehicle.active ?? true) ? 'Publicado' : 'Rascunho'),
-      transmission: vehicle.Transmission ?? vehicle.transmission ?? 'Automatico',
+      transmission: vehicle.Transmission ?? vehicle.transmission ?? 'Automático',
       fuel: vehicle.Fuel ?? vehicle.fuel ?? 'Flex',
       body: vehicle.Body ?? vehicle.body ?? 'Sedan',
       engine: vehicle.Engine ?? vehicle.engine ?? '',

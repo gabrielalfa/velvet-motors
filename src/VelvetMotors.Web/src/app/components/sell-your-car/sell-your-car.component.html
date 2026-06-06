@@ -9,7 +9,7 @@
       <h1>{{ content().sellTitle }}</h1>
       <i></i>
       <p>{{ content().sellDescription }}</p>
-      <p>Apos a analise, voce decide entre venda direta, troca ou consignacao premium.</p>
+      <p>Após a análise, você decide entre venda direta, troca ou consignação premium.</p>
     </aside>
 
     <main class="sell-form-card">
@@ -39,8 +39,8 @@
           <input type="number" placeholder="2022" name="year" [(ngModel)]="proposal.year" required>
         </label>
         <label>
-          <span>Transmissao</span>
-          <input type="text" placeholder="Automatico" name="transmission" [(ngModel)]="proposal.transmission">
+          <span>Transmissão</span>
+          <input type="text" placeholder="Automático" name="transmission" [(ngModel)]="proposal.transmission">
         </label>
         <label>
           <span>Quilometragem</span>
@@ -53,14 +53,14 @@
 
         <div class="upload-row">
           <label>
-            <span>Fotos do veiculo</span>
+            <span>Fotos do veículo</span>
             <button type="button">
               <iconify-icon icon="lucide:paperclip"></iconify-icon>
               Selecionar arquivos
             </button>
           </label>
           <label>
-            <span>Video do veiculo</span>
+            <span>Video do veículo</span>
             <input type="url" placeholder="https://" name="videoUrl" [(ngModel)]="proposal.videoUrl">
           </label>
         </div>
@@ -74,8 +74,8 @@
           <input type="text" placeholder="Couro preto, caramelo..." name="interiorColor" [(ngModel)]="proposal.interiorColor">
         </label>
         <label>
-          <span>Historico</span>
-          <input type="text" placeholder="Unico dono, revisoes, observacoes" name="history" [(ngModel)]="proposal.history">
+            <span>Histórico</span>
+          <input type="text" placeholder="Único dono, revisoes, observacoes" name="history" [(ngModel)]="proposal.history">
         </label>
 
         <label>
@@ -88,16 +88,16 @@
         </label>
         <label>
           <span>Telefone / WhatsApp</span>
-          <input type="tel" placeholder="(11) 99999-0000" name="customerPhone" [(ngModel)]="proposal.customerPhone" required>
+            <input type="tel" placeholder="(54) 9 9307-2551" name="customerPhone" [(ngModel)]="proposal.customerPhone" required>
         </label>
         <label class="span-full">
           <span>Mensagem</span>
-          <textarea placeholder="Conte um pouco sobre o veiculo e seu objetivo." name="message" [(ngModel)]="proposal.message"></textarea>
+          <textarea placeholder="Conte um pouco sobre o veículo e seu objetivo." name="message" [(ngModel)]="proposal.message"></textarea>
         </label>
 
         <button class="btn btn-primary" type="submit" [disabled]="sending()">
           <iconify-icon icon="lucide:save"></iconify-icon>
-          {{ sending() ? 'Enviando...' : 'Enviar avaliacao' }}
+          {{ sending() ? 'Enviando...' : 'Enviar avaliação' }}
         </button>
       </form>
     </main>

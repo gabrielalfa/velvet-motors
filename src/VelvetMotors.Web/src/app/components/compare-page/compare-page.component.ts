@@ -42,14 +42,14 @@ export class ComparePageComponent {
   });
 
   readonly rows: CompareRow[] = [
-    { label: 'Condicao', icon: 'lucide:badge-check', value: (vehicle) => vehicle.badge || 'Selecionado' },
+    { label: 'Condição', icon: 'lucide:badge-check', value: (vehicle) => vehicle.badge || 'Selecionado' },
     { label: 'Carroceria', icon: 'lucide:car-front', value: (vehicle) => vehicle.body || 'Sedan' },
     { label: 'Marca', icon: 'lucide:landmark', value: (vehicle) => vehicle.name.split(' ')[0] },
     { label: 'Modelo', icon: 'lucide:signature', value: (vehicle) => vehicle.name },
-    { label: 'Combustivel', icon: 'lucide:fuel', value: (vehicle) => vehicle.fuel || '-' },
+    { label: 'Combustível', icon: 'lucide:fuel', value: (vehicle) => vehicle.fuel || '-' },
     { label: 'Motor', icon: 'lucide:cpu', value: (vehicle) => vehicle.engine || '2.0 Turbo' },
     { label: 'Ano', icon: 'lucide:calendar-days', value: (vehicle) => String(vehicle.year) },
-    { label: 'Cambio', icon: 'lucide:settings', value: (vehicle) => vehicle.transmission || '-' },
+    { label: 'Câmbio', icon: 'lucide:settings', value: (vehicle) => vehicle.transmission || '-' },
     { label: 'Quilometragem', icon: 'lucide:gauge', value: (vehicle) => `${vehicle.km.toLocaleString('pt-BR')} km` },
     { label: 'Valor', icon: 'lucide:badge-dollar-sign', value: (vehicle) => `R$ ${vehicle.price.toLocaleString('pt-BR')}` },
     { label: 'Cor externa', icon: 'lucide:sparkles', value: (vehicle) => vehicle.exteriorColor || 'Sob consulta' },

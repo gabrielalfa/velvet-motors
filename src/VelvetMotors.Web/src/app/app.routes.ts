@@ -11,12 +11,12 @@ export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    title: 'Velvet Motors | Veiculos premium em Sao Paulo'
+    title: 'Velvet Motors | Veículos premium em São Paulo'
   },
   {
     path: 'veiculos',
     component: FleetPageComponent,
-    title: 'Veiculos | Velvet Motors'
+    title: 'Veículos | Velvet Motors'
   },
   {
     path: 'frota',
@@ -26,12 +26,12 @@ export const routes: Routes = [
   {
     path: 'veiculo/:id',
     component: VehicleDetailsComponent,
-    title: 'Detalhes do veiculo | Velvet Motors'
+    title: 'Detalhes do veículo | Velvet Motors'
   },
   {
     path: 'comparar',
     component: ComparePageComponent,
-    title: 'Comparar veiculos | Velvet Motors'
+    title: 'Comparar veículos | Velvet Motors'
   },
   {
     path: 'vender-seu-carro',

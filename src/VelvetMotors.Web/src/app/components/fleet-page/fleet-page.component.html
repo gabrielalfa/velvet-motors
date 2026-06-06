@@ -1,9 +1,9 @@
 <section class="fleet-page">
   <div class="section-shell fleet-page__header">
     <div>
-      <span class="eyebrow">Veiculos Velvet</span>
-      <h1>Veiculos selecionados</h1>
-      <p>Filtre por marca, ano, faixa de preco e encontre o carro certo para sua proxima fase.</p>
+      <span class="eyebrow">Estoque Velvet</span>
+      <h1>VEÍCULOS DISPONÍVEIS</h1>
+      <p>Filtre por marca, ano, combustível e transmissão para encontrar o veículo ideal.</p>
     </div>
     <button class="filter-trigger" type="button" (click)="filtersOpen.set(true)">
       <iconify-icon icon="lucide:sliders-horizontal"></iconify-icon>
@@ -49,8 +49,8 @@
           <span>Ordenar:</span>
           <select [ngModel]="sortBy()" (ngModelChange)="setSortBy($event)">
             <option value="newest">Mais recentes</option>
-            <option value="price-low">Menor preco</option>
-            <option value="price-high">Maior preco</option>
+            <option value="price-low">Menor preço</option>
+            <option value="price-high">Maior preço</option>
             <option value="mileage-low">Menor km</option>
           </select>
         </label>
@@ -81,8 +81,8 @@
       } @else if (!filteredVehicles().length) {
         <div class="empty-state">
           <iconify-icon icon="lucide:search-x"></iconify-icon>
-          <h2>Nenhum veiculo encontrado</h2>
-          <p>Ajuste os filtros ou confira se a API retornou veiculos para a selecao.</p>
+          <h2>Nenhum veículo encontrado</h2>
+          <p>Ajuste os filtros ou confira se a API retornou veículos para a seleção.</p>
         </div>
       } @else {
         <div class="fleet-list" [class.fleet-list--grid]="viewMode() === 'grid'">
@@ -143,7 +143,7 @@
         </div>
 
         <div class="fleet-load-more">
-          <span>{{ visibleVehicles().length }} de {{ filteredVehicles().length }} veiculos exibidos</span>
+          <span>{{ visibleVehicles().length }} de {{ filteredVehicles().length }} veículos exibidos</span>
           @if (hasMoreVehicles()) {
             <button type="button" (click)="loadMoreVehicles()">
               <iconify-icon icon="lucide:plus"></iconify-icon>
@@ -160,7 +160,7 @@
   <div class="filters__head">
     <iconify-icon icon="lucide:tune"></iconify-icon>
     <div>
-      <strong>Filtro de veiculos</strong>
+      <strong>Filtro de veículos</strong>
       <span>Refine a curadoria</span>
     </div>
   </div>
@@ -168,15 +168,6 @@
   <label>
     <span>Busca</span>
     <input type="search" placeholder="BMW, Audi, Mercedes" [ngModel]="search()" (ngModelChange)="setSearch($event)">
-  </label>
-
-  <label>
-    <span>Condicao</span>
-    <select [ngModel]="condition()" (ngModelChange)="setCondition($event)">
-      @for (item of conditions(); track item) {
-        <option [value]="item">{{ item }}</option>
-      }
-    </select>
   </label>
 
   <label>
@@ -189,7 +180,7 @@
   </label>
 
   <label>
-    <span>Combustivel</span>
+    <span>Combustível</span>
     <select [ngModel]="fuel()" (ngModelChange)="setFuel($event)">
       @for (item of fuels(); track item) {
         <option [value]="item">{{ item }}</option>
@@ -216,28 +207,14 @@
   </label>
 
   <label>
-    <span>Quilometragem maxima: {{ maxMileage() | number:'1.0-0' }} km</span>
-    <input type="range" min="0" max="200000" step="5000" [ngModel]="maxMileage()" (ngModelChange)="setMaxMileage($event)">
-  </label>
-
-  <label>
-    <span>Preco maximo: {{ maxPrice() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+    <span>Preço maximo: {{ maxPrice() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
     <input type="range" min="80000" max="700000" step="5000" [ngModel]="maxPrice()" (ngModelChange)="setMaxPrice($event)">
   </label>
 
   <label>
-    <span>Transmissao</span>
+    <span>Transmissão</span>
     <select [ngModel]="transmission()" (ngModelChange)="setTransmission($event)">
       @for (item of transmissions; track item) {
-        <option [value]="item">{{ item }}</option>
-      }
-    </select>
-  </label>
-
-  <label>
-    <span>Status</span>
-    <select [ngModel]="status()" (ngModelChange)="setStatus($event)">
-      @for (item of statuses; track item) {
         <option [value]="item">{{ item }}</option>
       }
     </select>

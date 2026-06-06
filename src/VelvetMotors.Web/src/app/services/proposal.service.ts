@@ -34,21 +34,21 @@ const fallbackProposals: Proposal[] = [
     id: 1,
     proposalType: 'sell',
     status: 'Novo',
-    source: 'Formulario de avaliacao',
+    source: 'Formulário de avaliação',
     make: 'BMW',
     model: '320i M Sport',
     year: 2021,
-    transmission: 'Automatico',
+    transmission: 'Automático',
     mileage: 42000,
     vin: '',
     exteriorColor: 'Preto',
     interiorColor: 'Couro preto',
-    history: 'Unico dono',
+    history: 'Único dono',
     videoUrl: '',
     customerName: 'Mariana Alves',
     customerEmail: 'mariana@email.com',
-    customerPhone: '(11) 99999-0000',
-    message: 'Tenho interesse em vender ou trocar meu veiculo.',
+  customerPhone: '(54) 9 9307-2551',
+    message: 'Tenho interesse em vender ou trocar meu veículo.',
     createdAt: new Date().toISOString()
   }
 ];
@@ -82,7 +82,7 @@ export class ProposalService {
     return this.http.post<VelvetOperationResult>(apiConfig.velvetInsertProposalUrl, proposal).pipe(
       catchError((error) => {
         console.error('Falha ao enviar proposta Velvet.', error);
-        return of({ success: false, message: 'Nao foi possivel enviar a proposta agora.' });
+        return of({ success: false, message: 'Não foi possível enviar a proposta agora.' });
       })
     );
   }
@@ -120,7 +120,7 @@ export class ProposalService {
       id: item.Id ?? item.id ?? 0,
       proposalType: ((item.ProposalType ?? item.proposalType ?? 'sell') as Proposal['proposalType']),
       status: item.Status ?? item.status ?? 'Novo',
-      source: item.Source ?? item.source ?? 'Formulario',
+      source: item.Source ?? item.source ?? 'Formulário',
       vehicleId: item.VehicleId ?? item.vehicleId,
       vehicleName: item.VehicleName ?? item.vehicleName ?? '',
       make: item.Make ?? item.make ?? '',

@@ -34,7 +34,7 @@ export class AdminAuthService {
       }),
       catchError((error) => {
         console.error('Falha ao autenticar no painel Velvet.', error);
-        return of({ success: false, message: 'Nao foi possivel conectar com a API de login.' });
+        return of({ success: false, message: 'Não foi possível conectar com a API de login.' });
       })
     );
   }
@@ -90,7 +90,7 @@ export class AdminAuthService {
     }).pipe(
       catchError((error) => {
         console.error('Falha ao alterar senha administrativa.', error);
-        return of({ success: false, message: 'Nao foi possivel alterar a senha agora.' });
+        return of({ success: false, message: 'Não foi possível alterar a senha agora.' });
       })
     );
   }

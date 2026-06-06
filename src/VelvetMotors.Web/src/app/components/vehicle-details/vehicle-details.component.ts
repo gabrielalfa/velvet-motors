@@ -94,7 +94,7 @@ export class VehicleDetailsComponent {
   whatsappUrl(vehicle: Vehicle): string {
     const content = this.siteContent();
     const number = content.whatsappNumber.replace(/\D/g, '');
-    const message = encodeURIComponent(`Ola, tenho interesse no ${vehicle.name} (${vehicle.year}) anunciado por ${this.formatPrice(vehicle.price)}.`);
+    const message = encodeURIComponent(`Olá, tenho interesse no ${vehicle.name} (${vehicle.year}) anunciado por ${this.formatPrice(vehicle.price)}.`);
 
     return `https://wa.me/${number}?text=${message}`;
   }
@@ -105,7 +105,7 @@ export class VehicleDetailsComponent {
 
   emailHref(vehicle: Vehicle): string {
     const subject = encodeURIComponent(`Interesse no ${vehicle.name}`);
-    const body = encodeURIComponent(`Ola, quero receber mais informacoes sobre o ${vehicle.name} ${vehicle.year}.`);
+    const body = encodeURIComponent(`Olá, quero receber mais informacoes sobre o ${vehicle.name} ${vehicle.year}.`);
 
     return `mailto:contato@velvetmotors.com.br?subject=${subject}&body=${body}`;
   }

@@ -19,7 +19,7 @@ export class HeaderComponent {
 
   readonly navItems = [
     { label: 'Home', href: '/' },
-    { label: 'Veiculos', href: '/veiculos' },
+    { label: 'Veículos', href: '/veiculos' },
     { label: 'Avaliação', href: '/vender-seu-carro' },
     { label: 'Diferenciais', href: '/#diferenciais' },
     { label: 'Contato', href: '#contato', scrollTarget: 'contato' }

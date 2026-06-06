@@ -11,7 +11,7 @@
       @if (selectedVehicles().length) {
         <button class="btn btn-ghost" type="button" (click)="clearComparison()">
           <iconify-icon icon="lucide:trash-2"></iconify-icon>
-          Limpar comparacao
+          Limpar comparação
         </button>
       }
     </div>
@@ -19,7 +19,7 @@
 
   <div class="section-shell compare-grid">
     <aside class="compare-title">
-      <h2>Compare<br>veiculos</h2>
+      <h2>Compare<br>veículos</h2>
       <span></span>
       <p>{{ selectedVehicles().length }}/3 selecionados</p>
     </aside>
@@ -28,7 +28,7 @@
       @for (vehicle of slots(); track $index) {
         <article class="compare-car" [class.compare-car--empty]="!vehicle">
           @if (vehicle) {
-            <button type="button" aria-label="Remover da comparacao" (click)="removeVehicle(vehicle)">
+            <button type="button" aria-label="Remover da comparação" (click)="removeVehicle(vehicle)">
               <iconify-icon icon="lucide:x"></iconify-icon>
             </button>
             <img [src]="vehicle.image" [alt]="vehicle.name">
@@ -38,7 +38,7 @@
             <a [routerLink]="['/veiculo', vehicle.id]">Ver detalhes</a>
           } @else {
             <iconify-icon icon="lucide:car-front"></iconify-icon>
-            <span>Adicionar veiculo</span>
+            <span>Adicionar veículo</span>
             <a routerLink="/veiculos">Escolher na vitrine</a>
           }
         </article>
@@ -62,7 +62,7 @@
     @if (availableVehicles().length && selectedVehicles().length < 3) {
       <section class="compare-suggestions">
         <div>
-          <span class="eyebrow">Adicionar a comparacao</span>
+          <span class="eyebrow">Adicionar a comparação</span>
           <h2>Sugestoes da vitrine</h2>
         </div>
         <div class="suggestion-list">

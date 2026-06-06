@@ -40,7 +40,7 @@ export class SellYourCarComponent {
 
   readonly steps = [
     { number: '1.', title: 'Dados do carro', subtitle: 'Modelo, ano e versao' },
-    { number: '2.', title: 'Estado geral', subtitle: 'Uso, fotos e historico' },
+    { number: '2.', title: 'Estado geral', subtitle: 'Uso, fotos e histórico' },
     { number: '3.', title: 'Contato', subtitle: 'Retorno consultivo' }
   ];
 

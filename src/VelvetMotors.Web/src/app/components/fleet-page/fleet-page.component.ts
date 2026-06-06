@@ -25,12 +25,9 @@ export class FleetPageComponent {
   readonly search = signal('');
   readonly brand = signal('Todos');
   readonly year = signal('Todos');
-  readonly condition = signal('Todos');
   readonly body = signal('Todos');
   readonly fuel = signal('Todos');
   readonly transmission = signal('Todos');
-  readonly status = signal('Todos');
-  readonly maxMileage = signal(200000);
   readonly maxPrice = signal(700000);
   readonly sortBy = signal('newest');
   readonly viewMode = signal<'list' | 'grid'>('list');
@@ -41,22 +38,17 @@ export class FleetPageComponent {
 
   readonly brands = computed(() => ['Todos', ...new Set(this.vehicles().map((vehicle) => vehicle.name.split(' ')[0]))]);
   readonly years = computed(() => ['Todos', ...new Set(this.vehicles().map((vehicle) => String(vehicle.year)))]);
-  readonly conditions = computed(() => ['Todos', ...new Set(this.vehicles().map((vehicle) => vehicle.badge).filter(Boolean))]);
   readonly fuels = computed(() => ['Todos', ...new Set(this.vehicles().map((vehicle) => vehicle.fuel).filter(Boolean))]);
   readonly bodies = ['Todos', 'Sedan', 'SUV', 'Hatchback', 'Coupe'];
-  readonly transmissions = ['Todos', 'Automatico', 'S tronic', '9G-Tronic', 'PDK'];
-  readonly statuses = ['Todos', 'Disponivel', 'Reservado', 'Novidade'];
+  readonly transmissions = ['Todos', 'Manual', 'Automático'];
 
   readonly filteredVehicles = computed(() => {
     const search = this.search().toLowerCase().trim();
     const brand = this.brand();
     const year = this.year();
-    const condition = this.condition();
     const body = this.body();
     const fuel = this.fuel();
     const transmission = this.transmission();
-    const status = this.status();
-    const maxMileage = this.maxMileage();
     const maxPrice = this.maxPrice();
     const sortBy = this.sortBy();
 
@@ -64,15 +56,12 @@ export class FleetPageComponent {
       const matchesSearch = !search || vehicle.name.toLowerCase().includes(search);
       const matchesBrand = brand === 'Todos' || vehicle.name.startsWith(brand);
       const matchesYear = year === 'Todos' || vehicle.year === Number(year);
-      const matchesCondition = condition === 'Todos' || vehicle.badge === condition;
       const matchesBody = body === 'Todos' || (vehicle.body || this.resolveBody(vehicle)).includes(body);
       const matchesFuel = fuel === 'Todos' || vehicle.fuel === fuel;
-      const matchesTransmission = transmission === 'Todos' || vehicle.transmission === transmission;
-      const matchesStatus = status === 'Todos' || this.resolveStatus(vehicle) === status;
-      const matchesMileage = vehicle.km <= maxMileage;
+      const matchesTransmission = transmission === 'Todos' || this.matchesTransmission(vehicle.transmission, transmission);
       const matchesPrice = vehicle.price <= maxPrice;
 
-      return matchesSearch && matchesBrand && matchesYear && matchesCondition && matchesBody && matchesFuel && matchesTransmission && matchesStatus && matchesMileage && matchesPrice;
+      return matchesSearch && matchesBrand && matchesYear && matchesBody && matchesFuel && matchesTransmission && matchesPrice;
     });
 
     return [...filtered].sort((a, b) => {
@@ -115,11 +104,6 @@ export class FleetPageComponent {
     this.resetPage();
   }
 
-  setCondition(value: string): void {
-    this.condition.set(value);
-    this.resetPage();
-  }
-
   setBody(value: string): void {
     this.body.set(value);
     this.resetPage();
@@ -132,16 +116,6 @@ export class FleetPageComponent {
 
   setTransmission(value: string): void {
     this.transmission.set(value);
-    this.resetPage();
-  }
-
-  setStatus(value: string): void {
-    this.status.set(value);
-    this.resetPage();
-  }
-
-  setMaxMileage(value: string): void {
-    this.maxMileage.set(Number(value));
     this.resetPage();
   }
 
@@ -167,12 +141,9 @@ export class FleetPageComponent {
     this.search.set('');
     this.brand.set('Todos');
     this.year.set('Todos');
-    this.condition.set('Todos');
     this.body.set('Todos');
     this.fuel.set('Todos');
     this.transmission.set('Todos');
-    this.status.set('Todos');
-    this.maxMileage.set(200000);
     this.maxPrice.set(700000);
     this.resetPage();
   }
@@ -182,7 +153,6 @@ export class FleetPageComponent {
     const brand = params.get('marca');
     const model = params.get('modelo');
     const year = params.get('ano');
-    const condition = params.get('condicao');
 
     if (brand) {
       this.brand.set(brand);
@@ -196,9 +166,6 @@ export class FleetPageComponent {
       this.year.set(year);
     }
 
-    if (condition) {
-      this.condition.set(condition);
-    }
   }
 
   closeFilters(): void {
@@ -212,7 +179,7 @@ export class FleetPageComponent {
     const changed = this.compareService.add(vehicle.id);
 
     if (!changed) {
-      this.compareFeedback.set('Voce pode comparar ate 3 veiculos por vez.');
+      this.compareFeedback.set('Você pode comparar até 3 veículos por vez.');
       return;
     }
 
@@ -242,7 +209,7 @@ export class FleetPageComponent {
       await this.copyToClipboard(shareUrl);
       this.setSharedVehicle(vehicle.id);
     } catch {
-      this.compareFeedback.set('Nao foi possivel gerar o link de compartilhamento agora.');
+      this.compareFeedback.set('Não foi possível gerar o link de compartilhamento agora.');
     }
   }
 
@@ -254,12 +221,23 @@ export class FleetPageComponent {
     return vehicle.name.toLowerCase().includes('q3') || vehicle.name.toLowerCase().includes('xc40') || vehicle.name.toLowerCase().includes('compass') ? 'SUV' : 'Sedan';
   }
 
-  resolveStatus(vehicle: Vehicle): string {
-    return vehicle.year >= 2024 ? 'Novidade' : vehicle.km < 20000 ? 'Disponivel' : 'Reservado';
-  }
-
   vehicleTrackBy(_: number, vehicle: Vehicle): number {
     return vehicle.id;
+  }
+
+  private matchesTransmission(vehicleTransmission: string, selectedTransmission: string): boolean {
+    const normalizedVehicleTransmission = this.normalizeText(vehicleTransmission);
+    const normalizedSelectedTransmission = this.normalizeText(selectedTransmission);
+
+    if (normalizedSelectedTransmission === 'manual') {
+      return normalizedVehicleTransmission.includes('manual');
+    }
+
+    if (normalizedSelectedTransmission === 'automatico') {
+      return !normalizedVehicleTransmission.includes('manual');
+    }
+
+    return false;
   }
 
   private resetPage(): void {
@@ -298,5 +276,13 @@ export class FleetPageComponent {
         this.sharedVehicleId.set(null);
       }
     }, 4500);
+  }
+
+  private normalizeText(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
   }
 }

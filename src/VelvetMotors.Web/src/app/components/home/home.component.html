@@ -70,7 +70,7 @@
   </div>
 </section>
 
-<section class="fleet" id="veiculos">
+<section class="fleet" id="veículos">
   <div class="section-shell">
     <div class="fleet__heading">
       <div>
@@ -79,12 +79,12 @@
       </div>
       <div class="fleet__controls">
         <button type="button" aria-label="Anterior" (click)="previousVehicle()">‹</button>
-        <button type="button" aria-label="Proximo" (click)="nextVehicle()">›</button>
+        <button type="button" aria-label="Próximo" (click)="nextVehicle()">›</button>
       </div>
     </div>
     
     @if (loading()) {
-      <div class="skeleton-grid" aria-label="Carregando veiculos">
+      <div class="skeleton-grid" aria-label="Carregando veículos">
         @for (item of [1, 2, 3]; track item) {
           <div class="skeleton-card"></div>
         }

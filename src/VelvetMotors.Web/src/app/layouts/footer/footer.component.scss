@@ -29,6 +29,10 @@ a {
   line-height: 1.7;
 }
 
+p {
+  white-space: pre-line;
+}
+
 h3 {
   color: var(--accent-hover);
   font-size: 0.85rem;
